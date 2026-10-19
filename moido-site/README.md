@@ -1,6 +1,6 @@
 # MOÍDO · site vitrine (Icreativa)
 
-> No ar: https://guisantosss.github.io/meussites/moido-site/
+> No ar: https://guisantosss.github.io/MeusSites/moido-site/
 > Contexto completo do projeto, decisões e próximos passos: **CLAUDE.md** (fica só na pasta local, não vai para o GitHub).
 
 Site de demonstração de uma hamburgueria fictícia, com scroll animado, sequências de imagens e brasas 3D.

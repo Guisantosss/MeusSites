@@ -1,5 +1,5 @@
 # Publica no GitHub Pages todos os sites deste repositório (cada pasta com package.json é um site).
-# Endereço de cada um: https://guisantosss.github.io/meussites/<pasta>/
+# Endereço de cada um: https://guisantosss.github.io/MeusSites/<pasta>/
 # Modelo: docs do Vite (static-deploy-github-pages.yaml), versões das actions fixadas por commit.
 name: Publicar sites
 
