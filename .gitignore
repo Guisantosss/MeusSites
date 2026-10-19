@@ -1,0 +1,9 @@
+# dependências e builds (o GitHub Actions monta cada site sozinho)
+node_modules/
+dist/
+_site/
+
+# material bruto e anotações internas: ficam só na pasta local, não vão para o GitHub (o repositório é público)
+moido-site/assets/raw/
+moido-site/CLAUDE.md
+moido-site/docs/

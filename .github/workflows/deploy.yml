@@ -1,0 +1,61 @@
+# Publica no GitHub Pages todos os sites deste repositório (cada pasta com package.json é um site).
+# Endereço de cada um: https://guisantosss.github.io/meussites/<pasta>/
+# Modelo: docs do Vite (static-deploy-github-pages.yaml), versões das actions fixadas por commit.
+name: Publicar sites
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}moido-site/
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: '*/package-lock.json'
+      - name: Montar os sites
+        run: |
+          mkdir -p _site
+          for pkg in */package.json; do
+            site="$(dirname "$pkg")"
+            echo "::group::$site"
+            (cd "$site" && npm ci && npm run build)
+            cp -r "$site/dist" "_site/$site"
+            echo "::endgroup::"
+          done
+      - name: Página inicial com a lista dos sites
+        run: |
+          {
+            echo '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Meus sites</title>'
+            echo '<style>body{margin:0;min-height:100vh;display:grid;place-content:center;gap:12px;background:#13110c;color:#f3e9da;font:18px/1.5 system-ui,sans-serif}a{color:#f2b33d}h1{margin:0 0 8px;font-size:28px}</style></head><body><h1>Meus sites</h1>'
+            for d in _site/*/; do n="$(basename "$d")"; echo "<a href=\"$n/\">$n</a>"; done
+            echo '</body></html>'
+          } > _site/index.html
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: './_site'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

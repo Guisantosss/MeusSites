@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MOÍDO, smash burger artesanal</title>
+  <meta name="description" content="Carne moída todo dia, prensada na chapa quente e servida em 7 minutos. Site de demonstração criado pela Icreativa.">
+  <meta name="theme-color" content="#13110C">
+  <meta property="og:title" content="MOÍDO, smash burger artesanal">
+  <meta property="og:description" content="Role pra desmontar o hambúrguer. Site de demonstração criado pela Icreativa.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://guisantosss.github.io/meussites/moido-site/">
+  <meta property="og:image" content="https://guisantosss.github.io/meussites/moido-site/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="img/g1-cutout.webp" as="image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2313110C'/%3E%3Ccircle cx='32' cy='34' r='16' fill='%23FF5A1F'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#cardapio">Pular para o cardápio</a>
+
+  <div class="loader" aria-hidden="true">
+    <div class="loader__glow"></div>
+    <div class="loader__num"><span class="loader__count">0</span><span class="loader__unit">%</span></div>
+    <p class="loader__label">Aquecendo a chapa</p>
+  </div>
+
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor" aria-hidden="true"></div>
+  <canvas class="embers" aria-hidden="true"></canvas>
+
+  <header class="nav">
+    <a class="nav__logo" href="#topo" aria-label="MOÍDO, voltar ao início">MOÍDO</a>
+    <nav class="nav__links" aria-label="Seções">
+      <a href="#cardapio">Cardápio</a>
+      <a href="#chapa">A chapa</a>
+      <a href="#pedido">Pedido</a>
+    </nav>
+    <a class="btn btn--small" href="#pedido">Pedir agora</a>
+  </header>
+
+  <main id="topo">
+    <!-- Abertura + desmontar: um palco só, preso na tela -->
+    <section class="stage" id="desmontar" aria-label="O hambúrguer, camada por camada">
+      <div class="stage__pin">
+        <h1 class="hero__title" aria-label="MOÍDO na casa.">
+          <span class="hero__mask"><span class="hero__line">MOÍDO</span></span>
+          <span class="hero__mask"><span class="hero__line">NA CASA.</span></span>
+        </h1>
+        <canvas class="seq" data-seq="f1" aria-hidden="true"></canvas>
+        <img class="hero__burger" src="img/g1-cutout.webp" alt="Smash burger com dois blends, cheddar derretido, cebola caramelizada e picles no pão brioche" width="1600" height="900">
+
+        <div class="hero__copy">
+          <p class="kicker">Smash burger artesanal</p>
+          <p class="hero__lead">Carne moída todo dia, prensada na chapa quente e servida em 7 minutos.</p>
+        </div>
+        <div class="hero__actions">
+          <a class="btn" href="#cardapio">Ver cardápio</a>
+          <a class="btn btn--ghost" href="https://wa.me/?text=Oi%2C%20quero%20pedir%20na%20MO%C3%8DDO" target="_blank" rel="noopener">Pedir no WhatsApp</a>
+        </div>
+        <p class="hero__hint"><span class="hero__hint-line"></span>Role pra desmontar</p>
+
+        <div class="layers">
+          <h2 class="layers__title">Cada camada tem um motivo.</h2>
+          <svg class="layers__lines" aria-hidden="true"></svg>
+          <ul class="layers__list">
+            <li data-layer="0">Brioche selado na manteiga</li>
+            <li data-layer="1">Molho da casa</li>
+            <li data-layer="2">Picles feito aqui</li>
+            <li data-layer="3">Cebola caramelizada por 4 horas</li>
+            <li data-layer="4">Cheddar derretido em dobro</li>
+            <li data-layer="5">Blend de 160 g, moído todo dia</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- A chapa -->
+    <section class="chapa" id="chapa" aria-labelledby="chapa-title">
+      <div class="chapa__pin">
+        <canvas class="seq" data-seq="f2" aria-hidden="true"></canvas>
+        <div class="chapa__copy">
+          <p class="kicker">A chapa</p>
+          <h2 id="chapa-title" class="h2">250 graus. 3 segundos de pressão.</h2>
+          <p class="body">É a prensa que cria a crosta crocante e segura o suco dentro.</p>
+        </div>
+        <p class="chapa__temp" aria-hidden="true"><span class="chapa__deg">0</span><span class="chapa__unit">°C</span></p>
+      </div>
+    </section>
+
+    <!-- Cardápio -->
+    <section class="menu" id="cardapio" aria-labelledby="menu-title">
+      <div class="menu__pin">
+       <div class="menu__rail">
+        <div class="menu__head">
+          <h2 id="menu-title" class="h2">Escolhe o seu.</h2>
+          <p class="body">Todos no pão brioche selado na manteiga.</p>
+        </div>
+        <ul class="menu__track">
+          <li class="ticket">
+            <div class="ticket__img"><img src="img/g1.webp" alt="Clássico: smash duplo com cheddar" loading="lazy" width="1600" height="900"></div>
+            <div class="ticket__paper">
+              <h3 class="ticket__name">Clássico</h3>
+              <p class="ticket__desc">Blend de 160 g, cheddar, cebola caramelizada, picles e molho da casa.</p>
+              <p class="ticket__price" data-price="32"><span class="ticket__cur">R$</span><span class="ticket__val">32</span></p>
+            </div>
+          </li>
+          <li class="ticket">
+            <div class="ticket__img"><img src="img/g6.webp" alt="Bacon Brasa: bacon, cheddar defumado e onion rings" loading="lazy" width="1600" height="900"></div>
+            <div class="ticket__paper">
+              <h3 class="ticket__name">Bacon Brasa</h3>
+              <p class="ticket__desc">Bacon crocante, cheddar defumado, onion rings e barbecue.</p>
+              <p class="ticket__price" data-price="38"><span class="ticket__cur">R$</span><span class="ticket__val">38</span></p>
+            </div>
+          </li>
+          <li class="ticket">
+            <div class="ticket__img"><img src="img/g7.webp" alt="Coalho na Brasa: queijo coalho na chapa, rúcula e tomate assado" loading="lazy" width="1600" height="900"></div>
+            <div class="ticket__paper">
+              <h3 class="ticket__name">Coalho na Brasa</h3>
+              <p class="ticket__desc">Queijo coalho na chapa, rúcula, tomate assado e mel.</p>
+              <p class="ticket__tag">Vegetariano</p>
+              <p class="ticket__price" data-price="34"><span class="ticket__cur">R$</span><span class="ticket__val">34</span></p>
+            </div>
+          </li>
+          <li class="ticket">
+            <div class="ticket__img"><img src="img/g8.webp" alt="Duplo Inferno: dois blends, pepper jack, jalapeño e chipotle" loading="lazy" width="1600" height="900"></div>
+            <div class="ticket__paper">
+              <h3 class="ticket__name">Duplo Inferno</h3>
+              <p class="ticket__desc">Dois blends, pepper jack, jalapeño e chipotle.</p>
+              <p class="ticket__tag ticket__tag--hot">Picante</p>
+              <p class="ticket__price" data-price="42"><span class="ticket__cur">R$</span><span class="ticket__val">42</span></p>
+            </div>
+          </li>
+        </ul>
+       </div>
+      </div>
+    </section>
+
+    <!-- O cheddar escorre e pinta a próxima seção -->
+    <section class="drip" aria-hidden="true">
+      <div class="drip__pin">
+        <canvas class="seq" data-seq="f3"></canvas>
+        <div class="drip__flood"></div>
+      </div>
+    </section>
+
+    <!-- Pedido -->
+    <section class="order" id="pedido" aria-labelledby="order-title">
+      <h2 id="order-title" class="order__title">Bateu a fome?</h2>
+      <div class="order__row">
+        <p class="body order__lead">Peça pelo WhatsApp ou retire no balcão.</p>
+        <div class="order__actions">
+          <a class="btn btn--dark magnetic" href="https://wa.me/?text=Oi%2C%20quero%20pedir%20na%20MO%C3%8DDO" target="_blank" rel="noopener">Pedir no WhatsApp</a>
+          <a class="btn btn--dark-ghost magnetic" href="https://www.google.com/maps/search/?api=1&query=Rua%20Exemplo%2C%20123" target="_blank" rel="noopener">Ver no mapa</a>
+        </div>
+      </div>
+      <dl class="order__info">
+        <div><dt>Horário</dt><dd>Terça a domingo, das 18h às 23h30</dd></div>
+        <div><dt>Endereço</dt><dd>Rua Exemplo, 123</dd></div>
+        <div><dt>Telefone</dt><dd>(00) 00000-0000</dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__word" aria-hidden="true">MOÍDO</p>
+    <div class="footer__row">
+      <p>Marca fictícia criada pela Icreativa para demonstração.</p>
+      <p>Quer um site assim? <a href="https://icreativa.com.br" target="_blank" rel="noopener">icreativa.com.br</a></p>
+      <p><a href="https://instagram.com/icreativanetwork" target="_blank" rel="noopener">@icreativanetwork</a></p>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
