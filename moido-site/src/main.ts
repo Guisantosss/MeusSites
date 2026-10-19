@@ -142,16 +142,15 @@ async function boot() {
   intro(tl);
 }
 
+// A entrada nunca mexe nos elementos que a rolagem anima (lanche, título, blocos de texto): só nos de dentro
+// (moldura do lanche, linhas do título, filhos dos blocos). Se a pessoa rolar com a entrada ainda rodando,
+// uma não desfaz a outra (antes o lanche inteiro reaparecia por cima do desmontado).
 function intro(after: gsap.core.Timeline) {
   const tl = gsap.timeline({ paused: true });
   tl.from(".hero__line", { yPercent: 110, duration: 1.1, ease: "power4.out", stagger: 0.08 })
-    .from(".hero__burger", {
-      y: (_i: number, el: Element) => Number(gsap.getProperty(el, "y")) + 40,
-      scale: (_i: number, el: Element) => Number(gsap.getProperty(el, "scale")) * 0.94,
-      opacity: 0, duration: 1.2, ease: "power3.out",
-    }, 0.1)
+    .from(".hero__burger-wrap", { y: 40, scale: 0.94, opacity: 0, duration: 1.2, ease: "power3.out" }, 0.1)
     .from(".hero__copy > *, .hero__actions > *", { y: 24, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.06 }, 0.4)
-    .from(".hero__hint", { opacity: 0, duration: 0.6 }, 0.9)
+    .from(".hero__hint-text", { opacity: 0, duration: 0.6 }, 0.9)
     .add(() => nav.classList.add("is-in"), 0.3);
   after.add(() => { tl.play(); }, "-=0.55");
 }
@@ -161,6 +160,7 @@ function initStage() {
   const stage = $(".stage");
   const canvas = $('canvas[data-seq="f1"]');
   const burger = $<HTMLImageElement>(".hero__burger");
+  const burgerWrap = $(".hero__burger-wrap");
   const svg = $<SVGSVGElement>(".layers__lines");
   const items = $$<HTMLLIElement>(".layers__list li");
   const NS = "http://www.w3.org/2000/svg";
@@ -184,19 +184,34 @@ function initStage() {
     let heroScale = isSmall() ? 1 : vh < 720 ? 0.62 : 0.7;
     let centerY = vh * 0.47;
     let room = vh * 0.66; // altura para o título + lanche
+    // título e lanche ficam entre o menu e a faixa de baixo (texto e botões da abertura)
+    const pin = $(".stage__pin").getBoundingClientRect().top;
+    const navBottom = 76;
+    const barTop = Math.min($(".hero__copy").getBoundingClientRect().top, $(".hero__actions").getBoundingClientRect().top) - pin - 14;
     if (isSmall()) {
-      // celular: título e lanche cabem entre o menu e o texto de baixo (celular baixo, tipo iPhone SE, encolhe o lanche)
-      const pin = $(".stage__pin").getBoundingClientRect().top;
-      const top = 76, bottom = $(".hero__copy").getBoundingClientRect().top - pin - 14;
-      centerY = (top + bottom) / 2;
-      room = bottom - top;
+      // celular: centraliza nesse vão (celular baixo, tipo iPhone SE, encolhe o lanche)
+      centerY = (navBottom + barTop) / 2;
+      room = barTop - navBottom;
       heroScale = Math.min(1, Math.max(0.55, (room - 1.6 * vw * 0.17) / (HERO_BURGER.h * fh * 0.98)));
     }
     const bh = HERO_BURGER.h * fh * heroScale;
     const gap = bh * (isSmall() ? 0.98 : 0.8);
-    const font = Math.min(vw * (isSmall() ? 0.24 : 0.21), (room - gap) / 1.6);
+    let font = Math.min(vw * (isSmall() ? 0.24 : 0.21), (room - gap) / 1.6);
+    if (!isSmall()) {
+      // computador e tablet: se o título encostaria na faixa de baixo, sobe; se nem assim couber (celular
+      // deitado), diminui a letra. Onde já cabe (notebooks, monitores) nada muda.
+      const H = 1.6 * font + gap;
+      if (centerY + H / 2 > barTop) centerY = barTop - H / 2;
+      if (centerY - H / 2 < navBottom) {
+        font = Math.max(vw * 0.06, Math.min(font, (barTop - navBottom - gap) / 1.6));
+        centerY = (navBottom + barTop) / 2;
+      }
+    }
     Object.assign(title.style, { fontSize: `${font}px`, gap: `${gap}px`, height: `${centerY * 2}px` });
-    if (!stageStarted) gsap.set(burger, { y: centerY - (y + HERO_BURGER.cy * fh), scale: heroScale });
+    hero.y = centerY - (y + HERO_BURGER.cy * fh);
+    hero.scale = heroScale;
+    burgerWrap.style.transformOrigin = `50% ${centerY}px`; // a entrada cresce a moldura a partir do centro do lanche
+    if (!stageStarted) gsap.set(burger, { y: hero.y, scale: hero.scale });
     const L = Math.max(60, Math.min(120, window.innerWidth * 0.07));
     LABEL_ANCHORS.forEach((a, i) => {
       const ax = x + a.x * fw, ay = y + a.y * fh;
@@ -222,12 +237,17 @@ function initStage() {
     });
   };
   let stageStarted = false;
+  const hero = { y: 0, scale: 1 }; // lanche na abertura (place() calcula)
   seqs.f1.onResize(place);
   place();
 
   if (reduced) return;
 
+  // Todas as partidas são explícitas (fromTo). Com .to()/.set() o GSAP decora o estado do momento em que o tween
+  // roda pela primeira vez: a entrada da página deixava o lanche com opacidade 0 nesse instante e, ao voltar ao
+  // topo, ele sumia. Explícitas também sobrevivem ao invalidateOnRefresh (redimensionar no meio da rolagem).
   const prog = { p: 0 };
+  const once = { immediateRender: false };
   const tl = gsap.timeline({
     defaults: { ease: "none" },
     scrollTrigger: {
@@ -236,15 +256,16 @@ function initStage() {
       end: () => `+=${(isSmall() ? 3.4 : 4.6) * window.innerHeight}`,
       pin: true,
       scrub: 0.6,
+      invalidateOnRefresh: true, // a posição do lanche na abertura muda com o tamanho da tela
       onUpdate: (st) => { stageStarted = st.progress > 0.001; },
     },
   });
-  tl.to(".hero__title", { yPercent: -14, opacity: 0, duration: 0.15 }, 0)
-    .to(burger, { y: 0, scale: 1, duration: 0.16, ease: "power1.inOut" }, 0)
-    .to(".hero__copy, .hero__actions, .hero__hint", { y: -36, opacity: 0, duration: 0.09 }, 0)
-    .set(canvas, { opacity: 1 }, 0.16)
-    .set(burger, { opacity: 0 }, 0.165)
-    .to(prog, { p: 1, duration: 0.52, onUpdate: () => seqs.f1.render(prog.p) }, 0.17)
+  tl.fromTo(".hero__title", { yPercent: 0, opacity: 1 }, { yPercent: -14, opacity: 0, duration: 0.15, ...once }, 0)
+    .fromTo(burger, { y: () => hero.y, scale: () => hero.scale }, { y: 0, scale: 1, duration: 0.16, ease: "power1.inOut", ...once }, 0)
+    .fromTo(".hero__copy, .hero__actions, .hero__hint", { y: 0, opacity: 1 }, { y: -36, opacity: 0, duration: 0.09, ...once }, 0)
+    .fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 0.002, ...once }, 0.16)
+    .fromTo(burger, { opacity: 1 }, { opacity: 0, duration: 0.002, ...once }, 0.165)
+    .fromTo(prog, { p: 0 }, { p: 1, duration: 0.52, immediateRender: false, onUpdate: () => seqs.f1.render(prog.p) }, 0.17)
     .fromTo(".layers__title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.05 }, 0.68);
 
   const mm = gsap.matchMedia();
@@ -262,7 +283,7 @@ function initStage() {
       const at = 0.72 + i * 0.04;
       tl.fromTo(dot, { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.01 }, at)
         .fromTo(items[i], { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.012 }, at);
-      if (i < parts.length - 1) tl.to(items[i], { opacity: 0, y: -12, duration: 0.012 }, at + 0.03);
+      if (i < parts.length - 1) tl.fromTo(items[i], { opacity: 1, y: 0 }, { opacity: 0, y: -12, duration: 0.012, immediateRender: false }, at + 0.03);
     });
     tl.to({}, { duration: 0.05 });
   });
@@ -285,8 +306,9 @@ function initChapa() {
     defaults: { ease: "none" },
     scrollTrigger: { trigger: ".chapa", start: "top top", end: () => `+=${(isSmall() ? 1.8 : 2.4) * window.innerHeight}`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
   });
-  tl.to(p, { p: 1, duration: 0.92, onUpdate: () => seqs.f2.render(p.p) }, 0)
-    .to(t, { v: 250, duration: 0.92 * IMPACT_AT, ease: "power1.in", onUpdate: () => { deg.textContent = String(Math.round(t.v)); } }, 0)
+  // partidas explícitas: com invalidateOnRefresh, um .to() redimensionado no meio guardaria o meio como começo
+  tl.fromTo(p, { p: 0 }, { p: 1, duration: 0.92, immediateRender: false, onUpdate: () => seqs.f2.render(p.p) }, 0)
+    .fromTo(t, { v: 0 }, { v: 250, duration: 0.92 * IMPACT_AT, ease: "power1.in", immediateRender: false, onUpdate: () => { deg.textContent = String(Math.round(t.v)); } }, 0)
     .to(".chapa__pin", { keyframes: [{ x: -4 }, { x: 4 }, { x: -3 }, { x: 2 }, { x: 0 }], duration: 0.03 }, 0.92 * IMPACT_AT)
     .to({}, { duration: 0.08 });
 }
@@ -308,8 +330,8 @@ function initMenu() {
   const mm = gsap.matchMedia();
   mm.add(MENU_PIN, () => {
     const distance = () => Math.max(0, rail.scrollWidth - window.innerWidth);
-    const move = gsap.to(rail, {
-      x: () => -distance(), ease: "none",
+    const move = gsap.fromTo(rail, { x: 0 }, {
+      x: () => -distance(), ease: "none", immediateRender: false,
       scrollTrigger: { trigger: ".menu", start: "top top", end: () => `+=${distance() * 1.5}`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
     });
     tickets.forEach((tk) => {
@@ -357,7 +379,7 @@ function initDrip() {
     defaults: { ease: "none" },
     scrollTrigger: { trigger: ".drip", start: "top top", end: () => `+=${1.6 * window.innerHeight}`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
   })
-    .to(p, { p: 1, duration: 0.7, onUpdate: () => seqs.f3.render(p.p) }, 0)
+    .fromTo(p, { p: 0 }, { p: 1, duration: 0.7, immediateRender: false, onUpdate: () => seqs.f3.render(p.p) }, 0)
     .fromTo(".drip__flood", { clipPath: "circle(0% at 50% 100%)" }, { clipPath: "circle(150% at 50% 100%)", duration: 0.36, ease: "power2.in" }, 0.6);
 }
 

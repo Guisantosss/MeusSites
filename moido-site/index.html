@@ -16,6 +16,12 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2313110C'/%3E%3Ccircle cx='32' cy='34' r='16' fill='%23FF5A1F'/%3E%3C/svg%3E">
 </head>
 <body>
+  <!-- ícones dos botões que levam para fora do site (WhatsApp: Simple Icons, CC0) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z"/></symbol>
+  </svg>
+
   <a class="skip" href="#cardapio">Pular para o cardápio</a>
 
   <div class="loader" aria-hidden="true">
@@ -36,7 +42,7 @@
       <a href="#chapa">A chapa</a>
       <a href="#pedido">Pedido</a>
     </nav>
-    <a class="btn btn--small" href="#pedido">Pedir agora</a>
+    <a class="btn btn--small btn--order" href="#pedido">Pedir agora</a>
   </header>
 
   <main id="topo">
@@ -48,17 +54,20 @@
           <span class="hero__mask"><span class="hero__line">NA CASA.</span></span>
         </h1>
         <canvas class="seq" data-seq="f1" aria-hidden="true"></canvas>
-        <img class="hero__burger" src="img/g1-cutout.webp" alt="Smash burger com dois blends, cheddar derretido, cebola caramelizada e picles no pão brioche" width="1600" height="900">
+        <!-- a moldura é da animação de entrada; o lanche dentro dela é da rolagem (assim uma não desfaz a outra) -->
+        <div class="hero__burger-wrap">
+          <img class="hero__burger" src="img/g1-cutout.webp" alt="Smash burger com dois blends, cheddar derretido, cebola caramelizada e picles no pão brioche" width="1600" height="900">
+        </div>
 
         <div class="hero__copy">
           <p class="kicker">Smash burger artesanal</p>
           <p class="hero__lead">Carne moída todo dia, prensada na chapa quente e servida em 7 minutos.</p>
         </div>
         <div class="hero__actions">
-          <a class="btn" href="#cardapio">Ver cardápio</a>
-          <a class="btn btn--ghost" href="https://wa.me/?text=Oi%2C%20quero%20pedir%20na%20MO%C3%8DDO" target="_blank" rel="noopener">Pedir no WhatsApp</a>
+          <a class="btn btn--ghost magnetic" href="#cardapio">Ver cardápio</a>
+          <a class="btn btn--order magnetic" href="https://wa.me/?text=Oi%2C%20quero%20pedir%20na%20MO%C3%8DDO" target="_blank" rel="noopener"><svg class="btn__icon" aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg><span>Pedir<span class="btn__more"> no WhatsApp</span></span></a>
         </div>
-        <p class="hero__hint"><span class="hero__hint-line"></span>Role pra desmontar</p>
+        <p class="hero__hint"><span class="hero__hint-line"></span><span class="hero__hint-text">Role pra desmontar</span></p>
 
         <div class="layers">
           <h2 class="layers__title">Cada camada tem um motivo.</h2>
@@ -150,8 +159,8 @@
       <div class="order__row">
         <p class="body order__lead">Peça pelo WhatsApp ou retire no balcão.</p>
         <div class="order__actions">
-          <a class="btn btn--dark magnetic" href="https://wa.me/?text=Oi%2C%20quero%20pedir%20na%20MO%C3%8DDO" target="_blank" rel="noopener">Pedir no WhatsApp</a>
-          <a class="btn btn--dark-ghost magnetic" href="https://www.google.com/maps/search/?api=1&query=Rua%20Exemplo%2C%20123" target="_blank" rel="noopener">Ver no mapa</a>
+          <a class="btn btn--dark magnetic" href="https://wa.me/?text=Oi%2C%20quero%20pedir%20na%20MO%C3%8DDO" target="_blank" rel="noopener"><svg class="btn__icon" aria-hidden="true" focusable="false"><use href="#i-whatsapp"/></svg>Pedir no WhatsApp</a>
+          <a class="btn btn--dark-ghost magnetic" href="https://www.google.com/maps/search/?api=1&query=Rua%20Exemplo%2C%20123" target="_blank" rel="noopener"><svg class="btn__icon" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg>Ver no mapa</a>
         </div>
       </div>
       <dl class="order__info">

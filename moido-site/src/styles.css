@@ -29,6 +29,7 @@ a { color: inherit; }
 ul { margin: 0; padding: 0; list-style: none; }
 h1, h2, h3, p, dl, dd { margin: 0; }
 :focus-visible { outline: 2px solid var(--brasa); outline-offset: 3px; border-radius: 2px; }
+.order :focus-visible, .nav.on-light :focus-visible { outline-color: var(--carvao); } /* brasa some no mostarda */
 ::selection { background: var(--mostarda); color: var(--carvao); }
 
 html.lenis, html.lenis body { height: auto; }
@@ -98,24 +99,31 @@ html.lenis, html.lenis body { height: auto; }
 .nav.on-light .nav__links a { color: rgba(19, 17, 12, 0.7); }
 .nav.on-light .nav__links a:hover { color: var(--carvao); }
 .nav.on-light .btn { background: var(--carvao); color: var(--creme); border-color: var(--carvao); }
+.nav.on-light .btn:hover { background: #000; border-color: #000; }
 .nav.is-in.is-hidden { translate: 0 -110%; }
 .nav__logo { font-family: var(--display); font-weight: 900; font-size: 30px; line-height: 1; text-decoration: none; letter-spacing: 0.01em; }
 .nav__links { display: flex; gap: 28px; margin-left: auto; }
 .nav__links a { font-weight: 500; font-size: 15px; text-decoration: none; color: var(--fumaca); transition: color 0.2s; }
 .nav__links a:hover { color: var(--creme); }
 
-/* ---------- botões ---------- */
+/* ---------- botões ----------
+   Pedir = mostarda sobre o escuro (carvão sobre a seção mostarda); o resto é contorno.
+   Ícone só nos que levam para fora do site (WhatsApp, mapa). */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 15px 24px; border-radius: 4px; border: 1.5px solid var(--creme);
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 52px; padding: 0 24px; border-radius: 4px; border: 1.5px solid var(--creme);
   background: var(--creme); color: var(--carvao);
-  font: 600 15px/1 var(--sans); letter-spacing: 0.01em; text-decoration: none; white-space: nowrap;
-  transition: background 0.25s, color 0.25s, border-color 0.25s;
+  font: 600 16px/1 var(--sans); letter-spacing: 0.005em; text-decoration: none; white-space: nowrap;
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s, scale 0.15s;
 }
 .btn:hover { background: #fff; border-color: #fff; }
+.btn:active { scale: 0.97; } /* afunda no clique (scale à parte: o efeito magnético usa o transform) */
+.btn__icon { width: 1.2em; height: 1.2em; flex: none; fill: currentColor; }
+.btn--order { background: var(--mostarda); border-color: var(--mostarda); color: var(--carvao); }
+.btn--order:hover { background: #f7c661; border-color: #f7c661; }
 .btn--ghost { background: transparent; color: var(--creme); border-color: rgba(243, 233, 218, 0.45); }
 .btn--ghost:hover { background: rgba(243, 233, 218, 0.1); border-color: var(--creme); }
-.btn--small { padding: 11px 16px; font-size: 14px; }
+.btn--small { min-height: 40px; padding: 0 16px; font-size: 14px; }
 .btn--dark { background: var(--carvao); color: var(--creme); border-color: var(--carvao); }
 .btn--dark:hover { background: #000; border-color: #000; }
 .btn--dark-ghost { background: transparent; color: var(--carvao); border-color: rgba(19, 17, 12, 0.5); }
@@ -143,7 +151,8 @@ html.lenis, html.lenis body { height: auto; }
 }
 .hero__mask { display: block; overflow: hidden; padding: 0.16em 0.04em 0; margin-top: -0.16em; }
 .hero__line { display: block; }
-.hero__burger { position: absolute; z-index: 3; pointer-events: none; max-width: none; }
+.hero__burger-wrap { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.hero__burger { position: absolute; pointer-events: none; max-width: none; }
 
 .hero__copy {
   position: absolute; z-index: 4; left: var(--pad); bottom: clamp(28px, 7vh, 72px);
@@ -272,13 +281,14 @@ html.lenis, html.lenis body { height: auto; }
 }
 @media (max-height: 480px) {
   .hero__hint { display: none; } /* celular deitado: a dica encostaria no título */
+  .hero__actions .btn { min-height: 44px; padding: 0 18px; font-size: 15px; } /* botões mais baixos, sobra altura para o título */
 }
 @media (max-width: 767px) and (max-height: 680px) {
   .hero__lead { display: none; } /* celular baixo: fica só o "Smash burger artesanal" acima dos botões */
 }
 /* tablet em pé: texto e botões da abertura centralizados, um acima do outro (lado a lado eles se encostam) */
 @media (min-width: 768px) and (max-aspect-ratio: 1/1) {
-  .hero__copy { left: var(--pad); right: var(--pad); bottom: calc(clamp(28px, 6vh, 64px) + 76px); max-width: none; text-align: center; justify-items: center; }
+  .hero__copy { left: var(--pad); right: var(--pad); bottom: calc(clamp(28px, 6vh, 64px) + 84px); max-width: none; text-align: center; justify-items: center; }
   .hero__lead { max-width: 40ch; }
   .hero__actions { left: var(--pad); right: var(--pad); bottom: clamp(28px, 6vh, 64px); justify-content: center; }
   .hero__hint { display: none; }
@@ -313,8 +323,17 @@ html.lenis, html.lenis body { height: auto; }
   .nav__links { display: none; }
   .nav__logo { font-size: 26px; }
   .hero__copy { left: var(--pad); right: var(--pad); bottom: 112px; max-width: none; text-align: center; justify-items: center; }
-  .hero__actions { left: var(--pad); right: var(--pad); bottom: 40px; justify-content: center; }
-  .hero__actions .btn { flex: 1; padding: 14px 10px; }
+  .hero__actions { left: var(--pad); right: var(--pad); bottom: 40px; justify-content: center; gap: 10px; max-width: 440px; margin-inline: auto; }
+  /* "Ver cardápio" do tamanho do texto; o de pedir ocupa o resto (e é o maior). Se nem assim couber,
+     o rótulo vira "Pedir" + ícone (container query, iPhone SE) */
+  .hero__actions .btn { min-height: 50px; padding: 0 14px; font-size: 15px; }
+  .hero__actions .btn--order { flex: 1 1 0; min-width: 0; padding: 0 12px; container-type: inline-size; }
+  .order__actions { flex-direction: column; width: 100%; }
+  .order__actions .btn { width: 100%; }
+  @container (max-width: 162px) { /* "Pedir no WhatsApp" + ícone precisa de ~161 px */
+    /* fica visualmente "Pedir" + ícone; o leitor de tela continua lendo "Pedir no WhatsApp" */
+    .btn__more { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
   .hero__hint { display: none; }
   .chapa__copy { top: 11vh; right: var(--pad); }
   .chapa .seq { transform: translateY(16vh); }
