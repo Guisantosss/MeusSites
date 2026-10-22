@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>Crema | Café de especialidade, da cereja à crema</title>
+    <meta
+      name="description"
+      content="Do pé à xícara numa tomada só: role a página e acompanhe o café da colheita à extração. Marca fictícia criada pela Icreativa."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <!-- TODO (Fase 5): Open Graph com a K5 como imagem de compartilhamento -->
+  </head>
+  <body>
+    <!-- 1. Preloader (Fase 4) -->
+    <div class="preloader" id="preloader" aria-hidden="true"></div>
+
+    <main id="conteudo">
+      <!-- 2 e 3. Filme: canvas preso na tela; a abertura (hero) e as etapas ficam por cima dele -->
+      <section class="film" id="film" aria-label="Do pé à xícara">
+        <div class="film__stage">
+          <canvas class="film__canvas" aria-hidden="true"></canvas>
+
+          <div class="hero" id="hero">
+            <h1 class="hero__title">Crema</h1>
+            <p class="hero__subtitle">Da cereja à crema.</p>
+            <p class="hero__hint">Role para baixo</p>
+          </div>
+
+          <ol class="steps" id="steps" aria-label="Etapas do café"></ol>
+          <div class="film__progress" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <!-- 4. Manifesto (Fase 4) -->
+      <section class="manifesto" id="manifesto" aria-label="Manifesto">
+        <p class="placeholder">Manifesto</p>
+      </section>
+
+      <!-- 5. Origens: rolagem horizontal (Fase 4) -->
+      <section class="origens" id="origens" aria-label="Origens">
+        <p class="placeholder">Origens</p>
+      </section>
+
+      <!-- 6. Produtos (Fase 4) -->
+      <section class="produtos" id="produtos" aria-label="Produtos">
+        <p class="placeholder">Produtos</p>
+      </section>
+
+      <!-- 7. Chamada final (Fase 4) -->
+      <section class="cta" id="cta" aria-label="Visite a Crema">
+        <p class="placeholder">Chamada final</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Crema é uma marca fictícia, criada pela Icreativa para demonstração.</p>
+      <p>Quer um site assim? <a href="https://icreativa.com.br" target="_blank" rel="noopener">icreativa.com.br</a></p>
+      <p><a href="https://instagram.com/icreativanetwork" target="_blank" rel="noopener">@icreativanetwork</a></p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
