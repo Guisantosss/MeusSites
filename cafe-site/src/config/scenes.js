@@ -35,7 +35,14 @@ export const SCENES = [
     alt: "Um grão de café verde, ainda cru, flutuando sobre fundo preto",
     weight: 0.9,
     zoom: 0.06,
-    // os últimos ~4 s são o grão girando devagar: recebem menos rolagem (curva dentro da cena, Fase 3)
+    // os últimos ~4 s são o grão girando devagar: recebem menos rolagem.
+    // timeMap = pares [fração da rolagem da cena, fração do tempo do vídeo]: 62% da rolagem cobre os 4 primeiros
+    // segundos e os 38% finais cobrem o giro lento
+    timeMap: [
+      [0, 0],
+      [0.62, 0.5],
+      [1, 1],
+    ],
     step: { number: "02", title: "Seleção", text: "Só o melhor grão segue adiante." },
   },
   {
@@ -58,6 +65,7 @@ export const SCENES = [
     id: "t4",
     video: "T4_explosao",
     cutAt: 3.75, // segundos: depois disso o grão "remonta" e isso nunca pode aparecer
+    fps: 24, // a explosão é rápida: todos os quadros, para a rolagem não andar aos pulos (o resto usa 12)
     from: "K3_grao_torrado",
     to: "K4b_nuvem_inicio_T5",
     still: "K4b_nuvem_inicio_T5",
@@ -74,6 +82,7 @@ export const SCENES = [
     still: "K5_xicara",
     alt: "Xícara preta com espresso e crema dourada, com vapor subindo",
     weight: 1.2,
+    weightNoVideo: 0.7, // enquanto só há a fusão (sem T5), quase 2 telas de rolagem cansavam; com o vídeo volta a 1.2
     zoom: 0.08,
     dust: true, // partículas de pó caindo sobre a fusão (só enquanto não houver T5)
     step: { number: "05", title: "Extração", text: "9 bar. 25 segundos. Uma xícara." },

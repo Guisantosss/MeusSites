@@ -2,10 +2,15 @@
 import { FILM, SCENES } from "../config/scenes.js";
 import { clamp } from "./math.js";
 
-export function buildTimeline() {
+/** Peso de cada cena; `hasVideo(id)` diz se a cena já tem quadros reais (sem vídeo vale `weightNoVideo`). */
+export function sceneWeight(scene, hasVideo) {
+  return !hasVideo(scene.id) && scene.weightNoVideo ? scene.weightNoVideo : scene.weight;
+}
+
+export function buildTimeline(hasVideo = () => true) {
   const segs = [
     { kind: "intro", weight: FILM.intro },
-    ...SCENES.map((scene, index) => ({ kind: "scene", index, scene, weight: scene.weight })),
+    ...SCENES.map((scene, index) => ({ kind: "scene", index, scene, weight: sceneWeight(scene, hasVideo) })),
     { kind: "outro", weight: FILM.outro },
   ];
   const total = segs.reduce((sum, s) => sum + s.weight, 0);

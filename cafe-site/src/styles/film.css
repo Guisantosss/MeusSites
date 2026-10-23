@@ -12,13 +12,31 @@
   background: var(--c-bg);
 }
 
+/* posição e tamanho vêm do FilmCanvas (tela cheia no notebook, só o quadrado no celular) */
 .film__canvas {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
   opacity: 0;
   transition: opacity 0.6s var(--ease-out);
+}
+
+/* celular: as bordas do quadrado dissolvem no preto (máscara aplicada pela placa de vídeo) */
+.film__canvas[data-edges="vertical"] {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+}
+
+/* tablet em pé: o quadrado não encosta nas laterais, então os lados também dissolvem */
+.film__canvas[data-edges="all"] {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .film.is-ready .film__canvas {

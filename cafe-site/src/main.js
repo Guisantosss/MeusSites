@@ -37,6 +37,10 @@ document.fonts.ready.then(() => ScrollTrigger.refresh());
 // Conferência no modo de desenvolvimento: cena atual, progresso dentro dela e do filme.
 if (import.meta.env.DEV) {
   window.__st = ScrollTrigger; // só para os testes automáticos do modo de desenvolvimento
+  window.__film = film;
+}
+// ?semhud esconde o contador (ele mesmo custa: reescrever um texto a cada quadro força layout)
+if (import.meta.env.DEV && !new URLSearchParams(location.search).has("semhud")) {
   const out = document.createElement("div");
   out.className = "dev-scroll";
   document.body.append(out);
@@ -44,7 +48,7 @@ if (import.meta.env.DEV) {
   gsap.ticker.add(() => {
     const s = film.getState();
     const txt = s
-      ? `${s.kind === "scene" ? SCENES[s.sceneIndex].id : s.kind} ${(s.local * 100).toFixed(0)}% · filme ${(s.P * 100).toFixed(1)}% · provisório`
+      ? `${s.kind === "scene" ? SCENES[s.sceneIndex].id : s.kind} ${(s.local * 100).toFixed(0)}% · filme ${(s.P * 100).toFixed(1)}% · ${film.stats()}`
       : "movimento reduzido";
     if (txt !== lastTxt) out.textContent = lastTxt = txt;
   });

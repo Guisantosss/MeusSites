@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "fps": 12,
+  "generated": "2026-10-23T10:55:08.143Z",
+  "scenes": {
+    "t1": {
+      "video": "T1_cereja_abre",
+      "sourceFps": 24,
+      "step": 2,
+      "lastSourceFrame": 191,
+      "skipFirst": false,
+      "seconds": 8,
+      "desktop": {
+        "count": 97,
+        "width": 1600,
+        "height": 900,
+        "kb": 4032
+      },
+      "mobile": {
+        "count": 97,
+        "width": 800,
+        "height": 800,
+        "kb": 2704
+      }
+    },
+    "t2": {
+      "video": "T2_grao_verde",
+      "sourceFps": 24,
+      "step": 2,
+      "lastSourceFrame": 191,
+      "skipFirst": true,
+      "seconds": 8,
+      "desktop": {
+        "count": 96,
+        "width": 1600,
+        "height": 900,
+        "kb": 3381
+      },
+      "mobile": {
+        "count": 96,
+        "width": 800,
+        "height": 800,
+        "kb": 2139
+      }
+    },
+    "t3": {
+      "video": "T3_torra",
+      "sourceFps": 24,
+      "step": 2,
+      "lastSourceFrame": 191,
+      "skipFirst": true,
+      "seconds": 8,
+      "desktop": {
+        "count": 96,
+        "width": 1280,
+        "height": 720,
+        "kb": 2718
+      },
+      "mobile": {
+        "count": 96,
+        "width": 800,
+        "height": 800,
+        "kb": 2296
+      }
+    },
+    "t4": {
+      "video": "T4_explosao",
+      "sourceFps": 24,
+      "step": 1,
+      "lastSourceFrame": 90,
+      "skipFirst": true,
+      "seconds": 3.7916666666666665,
+      "desktop": {
+        "count": 90,
+        "width": 1280,
+        "height": 720,
+        "kb": 4757
+      },
+      "mobile": {
+        "count": 90,
+        "width": 800,
+        "height": 800,
+        "kb": 3286
+      }
+    }
+  },
+  "bytes": {
+    "desktop": 15244288,
+    "mobile": 10675264
+  }
+}

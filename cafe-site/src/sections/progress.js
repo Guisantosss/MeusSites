@@ -12,6 +12,10 @@ export function createProgress(root) {
   const segs = [...root.querySelectorAll(".seg")].map((el) => ({ el, fill: el.querySelector(".seg__fill"), active: null, v: -1 }));
 
   return {
+    /** Ajusta o comprimento dos trechos quando os pesos mudam (ex.: cena sem vídeo ocupa menos rolagem). */
+    setWeights(weights) {
+      segs.forEach((s, i) => s.el.style.setProperty("--w", weights[i]));
+    },
     update(state) {
       root.style.opacity = state.kind === "intro" ? smoothstep(0.55, 1, state.local).toFixed(3) : 1;
       segs.forEach((s, i) => {

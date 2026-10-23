@@ -6,8 +6,9 @@ import { createHero } from "../sections/hero.js";
 import { createProgress } from "../sections/progress.js";
 import { createSteps } from "../sections/steps.js";
 import { FilmCanvas } from "./FilmCanvas.js";
+import { FrameSource } from "./FrameSource.js";
 import { KeyframeSource } from "./KeyframeSource.js";
-import { buildTimeline, stateAt } from "./timeline.js";
+import { buildTimeline, sceneWeight, stateAt } from "./timeline.js";
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -20,11 +21,51 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
   const steps = createSteps(section.querySelector(".steps"));
   const progress = createProgress(section.querySelector(".film__progress"));
   const hero = createHero(section.querySelector(".hero"));
-  const segs = buildTimeline();
+  let segs = buildTimeline();
+  // FILM.scrollVh vale para o filme completo; com uma cena mais curta (sem vídeo), a rolagem total encolhe junto,
+  // assim cada cena mantém o ritmo
+  const totalOf = (list) => list.reduce((sum, s) => sum + s.weight, 0);
+  const fullTotal = totalOf(segs);
+  let lengthFactor = 1;
   let dirty = true;
-  const source = new KeyframeSource(() => (dirty = true));
   let dust = null;
   let state = stateAt(segs, 0);
+  let mode = null;
+  const redraw = () => (dirty = true);
+
+  // Fonte das imagens: com public/frames/manifest.json (gerado por `npm run frames`) o filme usa os quadros reais;
+  // sem ele, o modo provisório (imagens-chave). A troca é automática.
+  let source = null;
+  let loadProgress = 0;
+  let resolveReady;
+  const ready = new Promise((r) => (resolveReady = r));
+  // no modo de desenvolvimento, ?provisorio força as imagens-chave (para comparar com os quadros reais)
+  const forceKeyframes = import.meta.env.DEV && new URLSearchParams(location.search).has("provisorio");
+  fetch(`${BASE}frames/manifest.json`)
+    .then((r) => (r.ok && !forceKeyframes ? r.json() : null))
+    .catch(() => null)
+    .then((manifest) => {
+      const useFrames = manifest && Object.keys(manifest.scenes ?? {}).length > 0;
+      source = useFrames ? new FrameSource(manifest, redraw) : new KeyframeSource(redraw);
+      if (useFrames) {
+        source.onProgress = (p) => (loadProgress = p);
+        // cena sem vídeo (fusão provisória) ocupa menos rolagem: refaz a divisão e a barra de etapas
+        segs = buildTimeline((id) => source.hasFrames(id));
+        progress.setWeights(SCENES.map((s) => sceneWeight(s, (id) => source.hasFrames(id))));
+        lengthFactor = totalOf(segs) / fullTotal;
+        ScrollTrigger.refresh();
+        state = stateAt(segs, ScrollTrigger.getById("film")?.progress ?? 0);
+      }
+      if (mode) loadSource();
+    });
+  const loadSource = () => {
+    const done = source.load(mode);
+    (source.loader?.ready ?? done ?? Promise.resolve()).then(() => {
+      loadProgress = 1;
+      resolveReady();
+    });
+    dirty = true;
+  };
 
   const measure = () => {
     const w = stage.clientWidth;
@@ -39,7 +80,11 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
       dust = new DustField(square ? 40 : 110); // celular: menos partículas (medido: era o que pesava na cena 5)
       dust.square = square;
     }
-    source.load(square ? "mobile" : "desktop");
+    const next = square ? "mobile" : "desktop";
+    if (next !== mode) {
+      mode = next;
+      if (source) loadSource();
+    }
     dirty = true;
   };
   new ResizeObserver(measure).observe(stage);
@@ -49,7 +94,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
     id: "film",
     trigger: section,
     start: "top top",
-    end: () => `+=${(window.innerHeight * FILM.scrollVh) / 100}`,
+    end: () => `+=${(window.innerHeight * FILM.scrollVh * lengthFactor) / 100}`,
     pin: true,
     anticipatePin: 1,
     invalidateOnRefresh: true,
@@ -59,24 +104,38 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
     },
   });
 
-  const dustOverlay = (ctx, box) => {
+  // pó só na cena que ainda não tem vídeo (quando a T5 chegar, ele desliga sozinho)
+  const dustActive = () => {
     const scene = SCENES[state.sceneIndex];
-    if (state.kind === "scene" && scene.dust) dust.draw(ctx, box, state.local);
+    return state.kind === "scene" && !!scene.dust && !source.hasFrames?.(scene.id);
   };
+  const dustOverlay = (ctx, box) => dust.draw(ctx, box, state.local);
 
+  const perf = { n: 0, total: 0, max: 0 }; // tempo do desenho, para a conferência do modo de desenvolvimento
   gsap.ticker.add(() => {
     if (!dirty) return;
     dirty = false;
-    if (source.firstReady) {
-      canvas.draw(source.layers(state), dustOverlay);
+    const t0 = performance.now();
+    if (source?.firstReady) {
+      canvas.draw(source.layers(state), dustOverlay, dustActive());
       section.classList.add("is-ready");
     }
     steps.update(state);
     progress.update(state);
     hero.update(state);
+    const dt = performance.now() - t0;
+    perf.n++;
+    perf.total += dt;
+    perf.max = Math.max(perf.max, dt);
   });
 
-  return { getState: () => state };
+  return {
+    getState: () => state,
+    /** Para o preloader (Fase 4): progresso 0..1 do essencial e a promessa de quando o filme pode começar. */
+    loading: { get progress() { return loadProgress; }, ready },
+    stats: () => (source ? `${source.kind ?? "provisório"}${source.stats ? ` · ${source.stats()}` : ""}` : "carregando"),
+    perf,
+  };
 }
 
 /** Movimento reduzido: sem filme por rolagem. Cada etapa vira uma imagem parada com os mesmos textos. */
