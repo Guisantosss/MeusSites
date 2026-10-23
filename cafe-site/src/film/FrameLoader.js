@@ -92,7 +92,10 @@ export class FrameLoader {
       this.waiting.clear();
       this.resolveReady();
     };
-    this.worker.postMessage({ type: "init", base: this.base, heads: this.packs.heads, scenes: this.scenes, essential: this.scenes[0]?.id });
+    // endereço completo: dentro do ajudante, um caminho relativo ("./frames/...") seria resolvido a partir do arquivo
+    // dele (assets/), e não da página. No site publicado isso dava 404 (no modo de desenvolvimento o caminho é absoluto)
+    const base = new URL(this.base, document.baseURI).href;
+    this.worker.postMessage({ type: "init", base, heads: this.packs.heads, scenes: this.scenes, essential: this.scenes[0]?.id });
   }
 
   /** Janela de vizinhos: maior à frente, no sentido em que a pessoa está rolando (o mesmo total de memória). */
