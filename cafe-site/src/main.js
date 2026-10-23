@@ -4,6 +4,7 @@ import "lenis/dist/lenis.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/film.css";
+import "./styles/sections.css";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -11,10 +12,21 @@ import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
 import { SCENES } from "./config/scenes.js";
 import { initFilm } from "./film/film.js";
+import { hideIntro, playIntro } from "./sections/intro.js";
+import { initManifesto } from "./sections/manifesto.js";
+import { initOrigens } from "./sections/origens.js";
+import { initPreloader } from "./sections/preloader.js";
+import { initProdutos } from "./sections/produtos.js";
+import { initReveals } from "./sections/reveal.js";
 
+document.documentElement.classList.remove("no-js");
 gsap.registerPlugin(ScrollTrigger, SplitText);
 // a barra de endereço do celular aparecendo/sumindo não recalcula as posições (evita pulos no meio do filme)
 ScrollTrigger.config({ ignoreMobileResize: true });
+
+// o filme é uma história com começo: ao recarregar, sempre volta para a abertura
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.documentElement.classList.toggle("reduced-motion", reducedMotion);
@@ -29,16 +41,32 @@ if (!reducedMotion) {
   gsap.ticker.lagSmoothing(0);
 }
 
+// seções na ordem da página (o ScrollTrigger calcula as posições nessa ordem)
 const film = initFilm({ gsap, ScrollTrigger, reducedMotion });
+initProdutos(document.getElementById("produtos"));
+initManifesto({ gsap, SplitText, reducedMotion });
+initOrigens({ gsap, ScrollTrigger, reducedMotion });
+initReveals({ gsap, SplitText, ScrollTrigger, reducedMotion });
+
+// preloader e entrada da abertura
+if (reducedMotion) {
+  document.getElementById("preloader")?.remove();
+} else {
+  const showIntro = hideIntro({ gsap });
+  initPreloader({ gsap, film, lenis }).then(() => {
+    showIntro();
+    playIntro({ gsap, SplitText });
+  });
+}
 
 // as fontes mudam a altura dos textos: recalcula as posições quando chegarem
 document.fonts.ready.then(() => ScrollTrigger.refresh());
 
-// Conferência no modo de desenvolvimento: cena atual, progresso dentro dela e do filme.
 if (import.meta.env.DEV) {
   window.__st = ScrollTrigger; // só para os testes automáticos do modo de desenvolvimento
   window.__film = film;
 }
+// Conferência no modo de desenvolvimento: cena atual, progresso dentro dela e do filme.
 // ?semhud esconde o contador (ele mesmo custa: reescrever um texto a cada quadro força layout)
 if (import.meta.env.DEV && !new URLSearchParams(location.search).has("semhud")) {
   const out = document.createElement("div");

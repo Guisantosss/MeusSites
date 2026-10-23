@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="no-js">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" />
     <title>Crema | Café de especialidade, da cereja à crema</title>
     <meta
@@ -13,8 +13,13 @@
     <!-- TODO (Fase 5): Open Graph com a K5 como imagem de compartilhamento -->
   </head>
   <body>
-    <!-- 1. Preloader (Fase 4) -->
-    <div class="preloader" id="preloader" aria-hidden="true"></div>
+    <!-- 1. Preloader: conta de 0 a 100 com o carregamento real do filme -->
+    <div class="preloader" id="preloader" role="status" aria-live="polite">
+      <p class="preloader__brand">Crema</p>
+      <p class="preloader__count" aria-hidden="true"><span class="preloader__num">0</span><span class="preloader__pct">%</span></p>
+      <div class="preloader__bar" aria-hidden="true"><span></span></div>
+      <span class="sr-only">Carregando o filme</span>
+    </div>
 
     <main id="conteudo">
       <!-- 2 e 3. Filme: canvas preso na tela; a abertura (hero) e as etapas ficam por cima dele -->
@@ -26,7 +31,7 @@
           <div class="hero" id="hero">
             <h1 class="hero__title">Crema</h1>
             <p class="hero__subtitle">Da cereja à crema.</p>
-            <p class="hero__hint">Role para baixo</p>
+            <p class="hero__hint"><span class="hero__hint-line" aria-hidden="true"></span><span class="hero__hint-text">Role para baixo</span></p>
           </div>
 
           <!-- etapas e barra montadas a partir de src/config/scenes.js -->
@@ -35,31 +40,183 @@
         </div>
       </section>
 
-      <!-- 4. Manifesto (Fase 4) -->
+      <!-- 4. Manifesto: as palavras "acendem" com a rolagem -->
       <section class="manifesto" id="manifesto" aria-label="Manifesto">
-        <p class="placeholder">Manifesto</p>
+        <p class="manifesto__text">
+          Café bom não tem segredo. Tem cuidado. A gente colhe no ponto, torra em pequenos lotes e mói na hora de
+          virar xícara. O resto é tempo, e o tempo a gente respeita.
+        </p>
       </section>
 
-      <!-- 5. Origens: rolagem horizontal (Fase 4) -->
-      <section class="origens" id="origens" aria-label="Origens">
-        <p class="placeholder">Origens</p>
+      <!-- 5. Origens: rolagem horizontal. TODO: origens provisórias (regiões reais, dados típicos de cada região) -->
+      <section class="origens" id="origens" aria-labelledby="origens-titulo">
+        <div class="origens__pin">
+          <div class="origens__track">
+            <header class="origens__intro">
+              <h2 class="section-title" id="origens-titulo">De onde vem</h2>
+              <p class="section-lead">
+                Três origens, três jeitos de ser café. Compramos em pequenos lotes, direto de quem planta.
+              </p>
+            </header>
+
+            <article class="origem">
+              <figure class="origem__foto">
+                <img src="./img/origens/brasil.webp" width="900" height="1125" loading="lazy" decoding="async"
+                  alt="Galho de cafeeiro com cerejas vermelhas e amarelas entre folhas verdes" />
+              </figure>
+              <div class="origem__info">
+                <p class="origem__pais">Brasil</p>
+                <h3 class="origem__nome">Sul de Minas</h3>
+                <dl class="ficha">
+                  <div><dt>Altitude</dt><dd>1.100 a 1.350 m</dd></div>
+                  <div><dt>Variedade</dt><dd>Bourbon Amarelo</dd></div>
+                  <div><dt>Processo</dt><dd>Natural</dd></div>
+                </dl>
+                <p class="origem__notas">Caramelo, castanhas e chocolate ao leite.</p>
+              </div>
+            </article>
+
+            <article class="origem">
+              <figure class="origem__foto">
+                <img src="./img/origens/colombia.webp" width="900" height="1125" loading="lazy" decoding="async"
+                  alt="Cafeeiro com cerejas verdes e uma vermelha madura, numa lavoura da Colômbia" />
+              </figure>
+              <div class="origem__info">
+                <p class="origem__pais">Colômbia</p>
+                <h3 class="origem__nome">Huila</h3>
+                <dl class="ficha">
+                  <div><dt>Altitude</dt><dd>1.500 a 1.900 m</dd></div>
+                  <div><dt>Variedade</dt><dd>Caturra e Castillo</dd></div>
+                  <div><dt>Processo</dt><dd>Lavado</dd></div>
+                </dl>
+                <p class="origem__notas">Rapadura, laranja e cacau.</p>
+              </div>
+            </article>
+
+            <article class="origem">
+              <figure class="origem__foto">
+                <img src="./img/origens/etiopia.webp" width="900" height="1125" loading="lazy" decoding="async"
+                  alt="Café servido da jebena, o bule tradicional etíope, numa xícara branca" />
+              </figure>
+              <div class="origem__info">
+                <p class="origem__pais">Etiópia</p>
+                <h3 class="origem__nome">Sidamo</h3>
+                <dl class="ficha">
+                  <div><dt>Altitude</dt><dd>1.800 a 2.200 m</dd></div>
+                  <div><dt>Variedade</dt><dd>Nativas da região</dd></div>
+                  <div><dt>Processo</dt><dd>Lavado</dd></div>
+                </dl>
+                <p class="origem__notas">Jasmim, bergamota e frutas vermelhas.</p>
+              </div>
+            </article>
+          </div>
+        </div>
       </section>
 
-      <!-- 6. Produtos (Fase 4) -->
-      <section class="produtos" id="produtos" aria-label="Produtos">
-        <p class="placeholder">Produtos</p>
+      <!-- 6. Produtos. TODO: nomes, notas, preços e fotos provisórios (embalagem desenhada em SVG) -->
+      <section class="produtos" id="produtos" aria-labelledby="produtos-titulo">
+        <header class="produtos__head">
+          <h2 class="section-title" id="produtos-titulo">Para levar para casa</h2>
+          <p class="section-lead">Grãos torrados toda semana, em pacotes de 250 g. Se preferir, a gente mói na hora.</p>
+        </header>
+        <div class="produtos__grid">
+          <article class="produto" data-bag="minas">
+            <div class="produto__visual" aria-hidden="true"></div>
+            <div class="produto__info">
+              <h3 class="produto__nome">Sul de Minas</h3>
+              <p class="produto__notas">Caramelo e chocolate ao leite</p>
+              <dl class="ficha ficha--produto">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 3" role="img" aria-label="Torra média"></span>Média</dd></div>
+                <div><dt>Peso</dt><dd>250 g</dd></div>
+              </dl>
+              <div class="produto__compra">
+                <p class="produto__preco">R$ 54,90</p>
+                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Sul%20de%20Minas%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="produto" data-bag="huila">
+            <div class="produto__visual" aria-hidden="true"></div>
+            <div class="produto__info">
+              <h3 class="produto__nome">Huila</h3>
+              <p class="produto__notas">Rapadura e laranja</p>
+              <dl class="ficha ficha--produto">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 2" role="img" aria-label="Torra média clara"></span>Média clara</dd></div>
+                <div><dt>Peso</dt><dd>250 g</dd></div>
+              </dl>
+              <div class="produto__compra">
+                <p class="produto__preco">R$ 64,90</p>
+                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Huila%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="produto" data-bag="sidamo">
+            <div class="produto__visual" aria-hidden="true"></div>
+            <div class="produto__info">
+              <h3 class="produto__nome">Sidamo</h3>
+              <p class="produto__notas">Jasmim e bergamota</p>
+              <dl class="ficha ficha--produto">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 1" role="img" aria-label="Torra clara"></span>Clara</dd></div>
+                <div><dt>Peso</dt><dd>250 g</dd></div>
+              </dl>
+              <div class="produto__compra">
+                <p class="produto__preco">R$ 79,90</p>
+                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Sidamo%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="produto" data-bag="casa">
+            <div class="produto__visual" aria-hidden="true"></div>
+            <div class="produto__info">
+              <h3 class="produto__nome">Da Casa</h3>
+              <p class="produto__notas">Cacau e nozes, para o dia a dia</p>
+              <dl class="ficha ficha--produto">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 4" role="img" aria-label="Torra média escura"></span>Média escura</dd></div>
+                <div><dt>Peso</dt><dd>250 g</dd></div>
+              </dl>
+              <div class="produto__compra">
+                <p class="produto__preco">R$ 44,90</p>
+                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Da%20Casa%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
+              </div>
+            </div>
+          </article>
+        </div>
       </section>
 
-      <!-- 7. Chamada final (Fase 4) -->
-      <section class="cta" id="cta" aria-label="Visite a Crema">
-        <p class="placeholder">Chamada final</p>
+      <!-- 7. Chamada final sobre a K5. TODO: WhatsApp (número), endereço e horário reais -->
+      <section class="cta" id="cta" aria-labelledby="cta-titulo">
+        <div class="cta__bg" aria-hidden="true">
+          <img src="./img/keyframes/desktop/K5_xicara.webp" width="1920" height="1080" loading="lazy" decoding="async" alt="" />
+        </div>
+        <div class="cta__content">
+          <h2 class="cta__title" id="cta-titulo">Sua próxima xícara começa aqui.</h2>
+          <p class="section-lead">Peça pelo WhatsApp ou venha provar na torrefação. A gente separa o seu pacote.</p>
+          <a class="btn btn--primary btn--magnetic" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20conhecer%20os%20caf%C3%A9s%20da%20Crema." target="_blank" rel="noopener">
+            <span>Pedir pelo WhatsApp</span>
+          </a>
+          <dl class="cta__info">
+            <div><dt>Endereço</dt><dd>Rua Exemplo, 123, São Paulo</dd></div>
+            <div><dt>Horário</dt><dd>Seg a sáb, das 8h às 18h</dd></div>
+          </dl>
+        </div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>Crema é uma marca fictícia, criada pela Icreativa para demonstração.</p>
-      <p>Quer um site assim? <a href="https://icreativa.com.br" target="_blank" rel="noopener">icreativa.com.br</a></p>
-      <p><a href="https://instagram.com/icreativanetwork" target="_blank" rel="noopener">@icreativanetwork</a></p>
+      <p class="footer__brand">Crema</p>
+      <div class="footer__cols">
+        <p>Crema é uma marca fictícia, criada pela Icreativa para demonstração.</p>
+        <p>Quer um site assim? Fale com a Icreativa:<br /><a href="https://icreativa.com.br" target="_blank" rel="noopener">icreativa.com.br</a> e <a href="https://instagram.com/icreativanetwork" target="_blank" rel="noopener">@icreativanetwork</a></p>
+        <p class="footer__credits">
+          Fotos das origens:
+          <a href="https://unsplash.com/@allecgomes" target="_blank" rel="noopener">Allec Gomes</a>,
+          <a href="https://unsplash.com/@juanfernino" target="_blank" rel="noopener">Juan Nino</a> e
+          <a href="https://unsplash.com/@amanuelet" target="_blank" rel="noopener">Amanuel Kebede</a>, no Unsplash.
+        </p>
+      </div>
     </footer>
 
     <script type="module" src="/src/main.js"></script>

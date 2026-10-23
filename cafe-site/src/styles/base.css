@@ -48,31 +48,22 @@ canvas {
   max-width: 100%;
 }
 
-/* ---------- seções (conteúdo na Fase 4) ---------- */
-.manifesto,
-.origens,
+/* ---------- seções (detalhes em sections.css) ---------- */
 .produtos,
+.cta {
+  padding: var(--section-pad) var(--gutter);
+}
+
 .cta {
   min-height: 100vh;
   min-height: 100svh;
-  padding: var(--section-pad) var(--gutter);
-  border-top: 1px solid var(--c-line);
-}
-
-.placeholder {
-  font-family: var(--f-display);
-  font-size: var(--t-xl);
-  color: var(--c-muted);
 }
 
 /* ---------- rodapé ---------- */
 .footer {
-  padding: 48px var(--gutter) 64px;
   border-top: 1px solid var(--c-line);
   color: var(--c-muted);
   font-size: var(--t-sm);
-  display: grid;
-  gap: 6px;
 }
 
 /* ---------- conferência da Fase 1 (só no modo de desenvolvimento) ---------- */

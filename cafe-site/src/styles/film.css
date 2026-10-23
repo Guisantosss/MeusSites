@@ -253,6 +253,7 @@
 .film[data-mode="square"] .hero__hint {
   left: 0;
   right: 0;
+  justify-content: center;
   text-align: center;
   bottom: calc(18px + env(safe-area-inset-bottom));
 }
