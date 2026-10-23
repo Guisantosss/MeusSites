@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "midia", "keyframes");
 const OUT = join(ROOT, "public", "img", "keyframes");
-const KEYS = ["K0_cereja", "K1_cereja_aberta", "K2_grao_verde", "K3_grao_torrado", "K4b_nuvem_inicio_T5", "K5_xicara"];
+const KEYS = ["K0_cereja", "K1_cereja_aberta", "K2_grao_verde", "K3_grao_torrado", "K4b_nuvem_inicio_T5", "K4c_portafiltro", "K5_xicara"];
 
 const VERSOES = {
   desktop: { vf: "scale=1920:-2:flags=lanczos", quality: 82 },

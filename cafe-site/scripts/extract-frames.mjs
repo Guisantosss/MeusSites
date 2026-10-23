@@ -1,10 +1,13 @@
 // Extrai os quadros dos vídeos de midia/videos (que nunca é alterada) e empacota em public/frames/ + manifest.json.
-//   desktop: 12 fps, largura 1600 (ou a original, se o vídeo for menor: T3/T4 em 720p ficam em 1280), WebP 80
-//   mobile:  12 fps, recorte quadrado central, 800x800, WebP 74
-// (qualidade acima da sugestão do plano, ~70/65: ainda dentro da meta de peso e com menos faixas no degradê da luz)
+//   desktop: 12 fps, largura 1600 (ou a original, se o vídeo for menor), WebP
+//   mobile:  12 fps, recorte quadrado central, 760x760, WebP (o plano sugeria 800: com as 6 cenas em 1080p passava da
+//            meta de 12 MB; a qualidade quase não mudava o peso, os pixels sim. 760 cobre a tela do filme no celular)
 // Emendas: o último quadro de cada clipe sempre entra e o primeiro do clipe seguinte (repetido) sai, para o filme
-// não pular entre as cenas. A T4 termina no quadro 90 (3,75 s), que é o mesmo quadro que abre a T5.
-// Cena sem vídeo (a T5, por enquanto) fica fora do manifest: o site usa a fusão provisória só nela.
+// não pular entre as cenas. A T4 termina no quadro 90 (3,75 s), que é o mesmo quadro que abre a T5a.
+// ⚠️ Corte da T4 (`cutAt` em scenes.js): corta por tempo na entrada (-t, antes de qualquer filtro) E pelo número do
+// quadro; depois do quadro 90 o grão se remonta ("explode e desexplode"). Vale para as duas versões. No fim, a
+// prancha scripts/check/t4_sheet.jpg mostra todos os quadros usados da T4 e a K4b, para conferir com os olhos.
+// Cena sem vídeo fica fora do manifest: o site usa a fusão provisória só nela.
 //
 // Pacotes: em vez de ~380 arquivos (um pedido de rede por quadro, caro para a linha principal do navegador),
 // cada modo tem 5 arquivos: heads.pack (o 1º quadro de cada cena, para a primeira tela) e um <cena>.pack por cena,
@@ -12,7 +15,7 @@
 // inteiro fica navegável cedo. O manifest guarda onde cada quadro começa e quantos bytes tem.
 //
 // Uso: npm run frames            (opções: --fps 10   --q 70,65)
-// Quando chegar o T5_xicara.mp4 (ou a T3/T4 em 1080p, com o mesmo nome), é só rodar de novo.
+// Vídeo novo com o mesmo nome em midia/videos: é só rodar de novo.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -26,8 +29,11 @@ const WORK = join(ROOT, ".frames-work"); // quadros soltos, só para montar os p
 const args = process.argv.slice(2);
 const opt = (name, def) => (args.includes(name) ? args[args.indexOf(name) + 1] : def);
 const FPS = Number(opt("--fps", 12));
-const [Q_DESKTOP, Q_MOBILE] = opt("--q", "80,74").split(",").map(Number);
+// notebook na qualidade sugerida no plano (70); celular um pouco abaixo dos 65 sugeridos, para caber na meta de peso
+// com as 6 cenas em 1080p (o plano manda baixar a qualidade se passar)
+const [Q_DESKTOP, Q_MOBILE] = opt("--q", "70,62").split(",").map(Number);
 const BUDGET_MB = { desktop: 20, mobile: 12 };
+const MOBILE_SIZE = 760;
 const MODES = ["desktop", "mobile"];
 
 const run = (cmd, a) => {
@@ -66,6 +72,41 @@ function packOrder(count) {
   return order;
 }
 
+/** Prancha de conferência de uma cena cortada: grade com todos os quadros usados e, embaixo, o último quadro (à
+ *  esquerda) ao lado da imagem-chave em que ele tem de terminar (à direita). Fica em scripts/check/<cena>_sheet.jpg. */
+function checkSheet(scene, list) {
+  const dir = join(ROOT, "scripts", "check");
+  mkdirSync(dir, { recursive: true });
+  const cols = 10;
+  const rows = Math.ceil(list.length / cols);
+  const gridW = cols * 240 + (cols - 1) * 4;
+  const half = Math.floor((gridW - 4) / 2);
+  const out = join(dir, `${scene.id}_sheet.jpg`);
+  run("ffmpeg", ["-v", "error", "-y", "-framerate", "1", "-i", join(dirname(list[0]), "%03d.webp"),
+    "-i", list.at(-1), "-i", join(ROOT, "midia", "keyframes", `${scene.to}.jpg`), "-filter_complex",
+    `[0]scale=240:-2,tile=${cols}x${rows}:padding=4:color=0x400000[g];[1]scale=${half}:-2[a];[2]scale=${half}:-2[b];` +
+      `[a][b]hstack=2,pad=${gridW}:ih+4:0:4:0x400000[c];[g][c]vstack=2`,
+    "-frames:v", "1", "-q:v", "3", out]);
+  return out;
+}
+
+/** Números (no vídeo original) dos quadros usados. `fpsByTime` da cena = [[a partir de (s), fps], ...]: cada trecho
+ *  com a sua taxa (a T4 usa 12 fps no começo lento e 24 na explosão). O último quadro sempre entra; nada depois do
+ *  corte; sem o 1º quadro quando ele repete o último da cena anterior. */
+function sourceFrames(scene, info, last, skipFirst) {
+  const ranges = scene.fpsByTime ?? [[0, scene.fps ?? FPS]];
+  const used = new Set();
+  ranges.forEach(([from, fps], i) => {
+    const a = Math.round(from * info.fps);
+    const b = i + 1 < ranges.length ? Math.round(ranges[i + 1][0] * info.fps) - 1 : last;
+    const step = Math.max(1, Math.round(info.fps / fps));
+    for (let n = a; n <= Math.min(b, last); n += step) used.add(n);
+  });
+  used.add(last);
+  if (skipFirst) used.delete(0);
+  return [...used].sort((x, y) => x - y);
+}
+
 const manifest = { version: 2, fps: FPS, generated: new Date().toISOString(), scenes: {}, packs: {} };
 const files = { desktop: {}, mobile: {} }; // cena -> lista de caminhos dos quadros (índice 0 = 1º quadro)
 let prevHadVideo = false;
@@ -79,23 +120,25 @@ for (const scene of SCENES) {
     continue;
   }
   const info = probe(file);
-  const step = Math.max(1, Math.round(info.fps / (scene.fps ?? FPS)));
   const last = scene.cutAt ? Math.round(scene.cutAt * info.fps) : info.frames - 1; // índice do último quadro usado
   const skipFirst = prevHadVideo; // o primeiro quadro repete o último da cena anterior
   prevHadVideo = true;
-  // quadros a cada `step`, mais o último; nada depois do corte; sem o primeiro se for emenda
-  let expr = `(not(mod(n\\,${step}))+eq(n\\,${last}))*lte(n\\,${last})`;
-  if (skipFirst) expr += "*gt(n\\,0)";
+  const used = sourceFrames(scene, info, last, skipFirst);
+  const expr = used.map((n) => `eq(n\\,${n})`).join("+");
 
+  // `quality` da cena (scenes.js) vale por cima da padrão: as cenas de pó comprimem mal e escondem bem a compressão
   const versions = {
-    desktop: { vf: `scale=${Math.min(1600, info.width)}:-2:flags=lanczos`, q: Q_DESKTOP },
-    mobile: { vf: "crop=ih:ih,scale=800:800:flags=lanczos", q: Q_MOBILE },
+    desktop: { vf: `scale=${Math.min(1600, info.width)}:-2:flags=lanczos`, q: scene.quality?.desktop ?? Q_DESKTOP },
+    mobile: { vf: `crop=ih:ih,scale=${MOBILE_SIZE}:${MOBILE_SIZE}:flags=lanczos`, q: scene.quality?.mobile ?? Q_MOBILE },
   };
-  const entry = { video: scene.video, sourceFps: info.fps, step, lastSourceFrame: last, skipFirst, seconds: (last + 1) / info.fps };
+  // `frames`: número de cada quadro no vídeo original (o site acha o quadro pelo tempo, mesmo com taxas diferentes)
+  const entry = { video: scene.video, sourceFps: info.fps, lastSourceFrame: last, skipFirst, seconds: (last + 1) / info.fps, frames: used };
+  // corte por tempo na entrada: só até o fim do último quadro usado (o quadro 90 da T4 vai de 3,75 a 3,79 s)
+  const cutInput = scene.cutAt ? ["-t", ((last + 1) / info.fps).toFixed(4)] : [];
   for (const [v, { vf, q }] of Object.entries(versions)) {
     const dir = join(WORK, v, scene.id);
     mkdirSync(dir, { recursive: true });
-    run("ffmpeg", ["-v", "error", "-y", "-i", file, "-an", "-vf", `select='${expr}',${vf}`, "-fps_mode", "passthrough",
+    run("ffmpeg", ["-v", "error", "-y", ...cutInput, "-i", file, "-an", "-vf", `select='${expr}',${vf}`, "-fps_mode", "passthrough",
       "-c:v", "libwebp", "-quality", String(q), "-compression_level", "6", "-start_number", "1", join(dir, "%03d.webp")]);
     const list = readdirSync(dir).filter((f) => f.endsWith(".webp")).sort().map((f) => join(dir, f));
     const p = probe(list[0]);
@@ -105,6 +148,7 @@ for (const scene of SCENES) {
   manifest.scenes[scene.id] = entry;
   console.log(`${scene.id}: ${entry.desktop.count} quadros (${entry.desktop.width}x${entry.desktop.height}) | celular ${entry.mobile.count}` +
     `${skipFirst ? " | sem o 1º quadro (emenda)" : ""}${scene.cutAt ? ` | cortada em ${scene.cutAt} s (quadro ${last})` : ""}`);
+  if (scene.cutAt) console.log(`   prancha para conferir o corte: ${checkSheet(scene, files.desktop[scene.id])}`);
 }
 
 // pacotes: limpa só o que este script cria (pastas de quadros soltos da versão antiga e os .pack)

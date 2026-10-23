@@ -20,6 +20,22 @@ function videoTime(scene, l) {
   return 1;
 }
 
+/** Quadro extraído mais perto do tempo t (0..1) do vídeo. Com a lista `frames` do manifest (número de cada quadro no
+ *  vídeo original) vale mesmo com taxas diferentes por trecho, como na T4; sem ela, os quadros são espaçados por igual. */
+function nearestFrame(entry, t, count) {
+  const list = entry.frames;
+  if (!list?.length) return Math.round(t * (count - 1));
+  const s = t * entry.lastSourceFrame;
+  let lo = 0;
+  let hi = list.length - 1;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (list[mid] <= s) lo = mid;
+    else hi = mid;
+  }
+  return s - list[lo] <= list[hi] - s ? lo : hi;
+}
+
 export class FrameSource {
   constructor(manifest, onFrame) {
     this.manifest = manifest;
@@ -47,12 +63,15 @@ export class FrameSource {
     this.mode = mode;
     this.loader?.dispose(); // troca notebook <-> celular: solta os quadros do outro modo
     const scenes = SCENES.filter((s) => this.has(s.id)).map((s) => ({ id: s.id, count: this.manifest.scenes[s.id][mode].count }));
+    const total = scenes.reduce((sum, s) => sum + s.count, 0);
     this.loader = new FrameLoader({
       base: `${BASE}frames/${mode}/`,
       scenes,
       packs: this.manifest.packs[mode],
       radius: mode === "mobile" ? 14 : 20,
-      coarse: mode === "mobile" ? 12 : 8,
+      // amostra sempre pronta de ~32 quadros, qualquer que seja o total (com as 6 cenas, 1 a cada 8 passaria de
+      // 70 quadros decodificados e ~400 MB só de amostra no notebook)
+      coarse: Math.max(mode === "mobile" ? 12 : 8, Math.ceil(total / 32)),
       onFrame: this.onFrame,
     });
     this.loader.start((p) => this.onProgress?.(p));
@@ -67,12 +86,12 @@ export class FrameSource {
   frameIndex(state) {
     const scene = SCENES[state.sceneIndex];
     if (!this.has(scene.id)) return -1;
-    const count = this.manifest.scenes[scene.id][this.mode].count;
+    const entry = this.manifest.scenes[scene.id];
     let t;
     if (state.kind === "intro") t = 0;
     else if (state.kind === "outro") t = 1;
     else t = clamp(videoTime(scene, state.local));
-    return this.loader.index(scene.id, Math.round(t * (count - 1)));
+    return this.loader.index(scene.id, nearestFrame(entry, t, entry[this.mode].count));
   }
 
   layers(state) {
@@ -98,7 +117,8 @@ export class FrameSource {
   stats() {
     const l = this.loader;
     if (!l) return "";
-    const per = this.mode === "mobile" ? 800 * 800 * 4 : 1600 * 900 * 4;
+    const { width, height } = this.manifest.scenes[SCENES[0].id][this.mode];
+    const per = width * height * 4;
     const m = l.memoryMB(per);
     return `quadros ${l.fetched}/${l.total} · prontos ${l.decodedCount} · ~${m.agora.toFixed(0)} MB (pico ${m.pico.toFixed(0)})`;
   }

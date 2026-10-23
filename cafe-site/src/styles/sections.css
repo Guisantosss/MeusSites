@@ -731,73 +731,89 @@ html.is-loading {
   margin-top: clamp(40px, 7vh, 84px);
 }
 
+/* palco do pacote. "isolation": a mistura das fotos (abaixo) só enxerga o que está dentro do palco */
 .graos__stage {
   position: relative;
   display: grid;
   place-items: center;
   aspect-ratio: 1 / 1.04;
   overflow: hidden;
+  isolation: isolate;
+  container-type: inline-size; /* o nome vazado é medido pela largura do palco */
   border: 1px solid var(--c-line);
   border-radius: 6px;
-  background: #070605;
+  background: #050403;
 }
 
-/* luz: um facho de cima (creme) e o brilho da cor do café atrás do pacote */
+/* luz: um facho de cima (creme) e o brilho da cor do café em volta do pacote */
 .graos__glow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(38% 30% at 50% 0%, rgba(242, 234, 223, 0.09), transparent 100%),
-    radial-gradient(52% 48% at 50% 56%, color-mix(in srgb, var(--accent) 46%, transparent), transparent 72%);
+    radial-gradient(38% 30% at 50% 0%, rgba(242, 234, 223, 0.08), transparent 100%),
+    radial-gradient(56% 50% at 50% 52%, color-mix(in srgb, var(--accent) 34%, transparent), transparent 74%);
 }
 
-/* sombra no chão, embaixo do pacote (fica parada enquanto ele flutua) */
-.graos__stage::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 80%;
-  width: 44%;
-  height: 7%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
-}
-
+/* nome vazado: grande o bastante para passar dos dois lados do pacote mesmo nos nomes curtos (Huila), e um pouco
+   acima do meio, na faixa escura entre o topo do pacote e os ingredientes (padding em % é da largura do palco) */
 .graos__ghost {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-bottom: 21%;
   font-family: var(--f-display);
   font-style: italic;
-  font-size: clamp(4rem, 2rem + 7vw, 10.5rem);
+  /* --len = número de letras (graos.js): nome curto fica em 34% da largura do palco; o longo encolhe para caber */
+  font-size: min(34cqi, calc(262cqi / var(--len, 6)));
   line-height: 1;
   white-space: nowrap;
   color: transparent;
-  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 60%, transparent);
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--accent) 85%, transparent);
   pointer-events: none;
 }
 
+/* As fotos têm fundo preto. Com "lighten" cada ponto fica com o mais claro entre a foto e o que está atrás: o preto
+   do fundo deixa aparecer a luz e o nome vazado, e o pacote, os ingredientes e o rótulo ficam por cima. A silhueta
+   (preta, no lugar exato do pacote nas fotos) tapa o nome e a luz atrás do pacote, senão eles atravessariam o pacote
+   preto. Silhueta e fotos ocupam a mesma caixa e flutuam com a mesma animação. */
+.graos__silhueta,
 .graos__bags {
+  grid-area: 1 / 1;
   position: relative;
-  z-index: 1;
-  width: 56%;
-  aspect-ratio: 240 / 320;
+  height: 96%;
+  aspect-ratio: 1200 / 1490;
   animation: graos-float 7s ease-in-out infinite;
+}
+
+.graos__silhueta::before {
+  content: "";
+  position: absolute;
+  left: 25.6%;
+  right: 26.2%;
+  top: 13.4%;
+  bottom: 19.8%;
+  border-radius: 3% / 2%;
+  background: #000;
+  filter: blur(4px);
+}
+
+.graos__bags {
+  mix-blend-mode: lighten;
 }
 
 .graos__bag {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.graos__bag svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-  filter: drop-shadow(0 40px 46px rgba(0, 0, 0, 0.7));
+/* sem JavaScript fica só a primeira foto (com ele, graos.js cuida de qual aparece) */
+.graos__bag + .graos__bag {
+  visibility: hidden;
 }
 
 @keyframes graos-float {
@@ -1053,7 +1069,7 @@ html.is-loading {
 
 /* animações infinitas param fora da tela (visibility.js marca .is-visible) */
 .visite:not(.is-visible) .visite__dot::after,
-.graos:not(.is-visible) .graos__bags {
+.graos:not(.is-visible) :is(.graos__bags, .graos__silhueta) {
   animation-play-state: paused;
 }
 
@@ -1264,10 +1280,6 @@ html.is-loading {
   .graos__stage {
     aspect-ratio: 1 / 0.86;
   }
-
-  .graos__bags {
-    width: 42%;
-  }
 }
 
 @media (max-width: 767px) {
@@ -1416,6 +1428,7 @@ html.is-loading {
 
 .reduced-motion .hero__hint-line::after,
 .reduced-motion .graos__bags,
+.reduced-motion .graos__silhueta,
 .reduced-motion .visite__dot::after {
   animation: none;
 }

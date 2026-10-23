@@ -31,6 +31,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
   let lengthFactor = 1;
   let dirty = true;
   let dust = null;
+  const usesDust = SCENES.some((s) => s.dust);
   let state = stateAt(segs, 0);
   let mode = null;
   const redraw = () => (dirty = true);
@@ -79,7 +80,8 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
     canvas.setSize(w, h, square);
     stage.style.setProperty("--sq-top", `${canvas.box.y}px`);
     stage.style.setProperty("--sq-bottom", `${canvas.box.y + canvas.box.h}px`);
-    if (!dust || dust.square !== square) {
+    // pó caindo: só para cena marcada com `dust` que ainda não tem vídeo (hoje nenhuma; todas têm quadros reais)
+    if (usesDust && (!dust || dust.square !== square)) {
       dust = new DustField(square ? 40 : 110); // celular: menos partículas (medido: era o que pesava na cena 5)
       dust.square = square;
     }
@@ -114,7 +116,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
   // pó só na cena que ainda não tem vídeo (quando a T5 chegar, ele desliga sozinho)
   const dustActive = () => {
     const scene = SCENES[state.sceneIndex];
-    return state.kind === "scene" && !!scene.dust && !source.hasFrames?.(scene.id);
+    return !!dust && state.kind === "scene" && !!scene.dust && !source.hasFrames?.(scene.id);
   };
   const dustOverlay = (ctx, box) => dust.draw(ctx, box, state.local);
 

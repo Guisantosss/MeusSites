@@ -242,10 +242,13 @@
   visibility: hidden;
 }
 
+/* véu, preto e palavras mudam de opacidade a cada quadro: cada um na sua camada (will-change), para a placa de
+   vídeo só misturar, sem repintar a tela inteira (medido no celular com CPU 4x) */
 .epilogue__veil {
   position: absolute;
   inset: 0;
   opacity: 0;
+  will-change: opacity;
   background: radial-gradient(ellipse 62% 58% at 50% 50%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.66) 58%, rgba(0, 0, 0, 0.94) 100%);
 }
 
@@ -269,11 +272,13 @@
   text-wrap: balance;
   opacity: 0;
   will-change: transform, opacity;
-  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
 }
 
+/* sem sombra borrada no texto: com ela, cada quadro do epílogo repintava o título inteiro */
 .epilogue__word {
+  display: inline-block;
   opacity: 0.2;
+  will-change: opacity;
 }
 
 .epilogue__text {
@@ -290,6 +295,7 @@
   inset: 0;
   background: #000;
   opacity: 0;
+  will-change: opacity;
 }
 
 /* ============ Celular e telas em pé: quadro quadrado em cima, textos embaixo ============ */

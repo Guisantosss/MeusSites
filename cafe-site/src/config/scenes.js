@@ -2,12 +2,14 @@
 // Os pesos são o ponto de partida do plano; o ajuste fino é feito no navegador (Fase 3).
 
 export const FILM = {
-  scrollVh: 980, // comprimento total da rolagem do filme, em vh (era 800 antes do epílogo: o mesmo ritmo por cena)
+  // comprimento total da rolagem do filme, em vh: ~142 vh por unidade de peso (o ritmo acertado na Fase 3), para as
+  // 6 cenas mais a abertura e o epílogo (0,3 + 6,1 + 1,5)
+  scrollVh: 1120,
   // trechos nas pontas (mesma unidade dos pesos das cenas):
   intro: 0.3, // a cereja fica parada enquanto o nome da marca sai de cena
   outro: 1.5, // epílogo: a câmera mergulha na crema, o manifesto acende por cima e tudo escurece até o preto
   squareBelow: 768, // abaixo desta largura (ou com a tela em pé) o filme usa o recorte quadrado do celular
-  // Epílogo sobre a última imagem do filme (hoje a K5; quando o vídeo T5 chegar, conferir se a crema continua aqui).
+  // Epílogo sobre a última imagem do filme (o último quadro da T5b, igual à K5; se o vídeo mudar, conferir a crema).
   // focus: centro da crema, em fração da imagem de cada modo. zoom: quanto a câmera avança até o fim.
   epilogue: {
     desktop: { focus: { x: 0.495, y: 0.47 }, zoom: 2.5 },
@@ -49,6 +51,11 @@ export const SCENES = [
       [0.62, 0.5],
       [1, 1],
     ],
+    // o giro lento (últimos 4 s) recebe pouca rolagem: 8 fps bastam ali (peso dos pacotes no celular)
+    fpsByTime: [
+      [0, 12],
+      [4, 8],
+    ],
     step: { number: "02", title: "Seleção", text: "Só o melhor grão segue adiante." },
   },
   {
@@ -71,26 +78,54 @@ export const SCENES = [
     id: "t4",
     video: "T4_explosao",
     cutAt: 3.75, // segundos: depois disso o grão "remonta" e isso nunca pode aparecer
-    fps: 24, // a explosão é rápida: todos os quadros, para a rolagem não andar aos pulos (o resto usa 12)
+    // [a partir de (s), fps]: até 2 s o grão só flutua (12 fps bastam); a explosão (2 a 3,75 s) é rápida e usa todos
+    // os quadros, para a rolagem não andar aos pulos (o resto do filme usa 12)
+    fpsByTime: [
+      [0, 12],
+      [2, 24],
+    ],
+    quality: { desktop: 56, mobile: 50 }, // pó: comprime mal e esconde a compressão (meta de peso do plano)
     from: "K3_grao_torrado",
     to: "K4b_nuvem_inicio_T5",
     still: "K4b_nuvem_inicio_T5",
     alt: "O grão explodindo numa nuvem de café moído que toma a tela",
-    weight: 0.8,
+    weight: 0.7,
     zoom: 0.22, // a explosão: o grão avança contra a câmera enquanto vira pó
     step: { number: "04", title: "Moagem", text: "Moído na hora de virar café." },
   },
   {
-    id: "t5",
-    video: "T5_xicara", // TODO: o vídeo ainda não existe; até chegar, fusão K4b → K5 com pó caindo
+    id: "t5a",
+    video: "T5a_dose", // o pó vira um redemoinho e cai no porta-filtro
     from: "K4b_nuvem_inicio_T5",
+    to: "K4c_portafiltro",
+    still: "K4c_portafiltro",
+    alt: "Porta-filtro cheio de café moído sobre uma xícara preta vazia",
+    weight: 1.0,
+    zoom: 0.06,
+    quality: { desktop: 60, mobile: 54 }, // redemoinho de pó (como a T4)
+    step: {
+      number: "05",
+      title: "Dose",
+      text: "18 gramas. Nem um a mais.",
+      counter: { from: 0, to: 18, unit: "g" },
+    },
+  },
+  {
+    id: "t5b",
+    video: "T5b_espresso", // água quente, o espresso escorre e a crema se forma; no fim o porta-filtro sobe e sai
+    from: "K4c_portafiltro",
     to: "K5_xicara",
     still: "K5_xicara",
     alt: "Xícara preta com espresso e crema dourada, com vapor subindo",
-    weight: 1.2,
-    weightNoVideo: 0.7, // enquanto só há a fusão (sem T5), quase 2 telas de rolagem cansavam; com o vídeo volta a 1.2
+    weight: 1.3,
     zoom: 0.08,
-    dust: true, // partículas de pó caindo sobre a fusão (só enquanto não houver T5)
-    step: { number: "05", title: "Extração", text: "9 bar. 25 segundos. Uma xícara." },
+    // fim generoso (a xícara é a imagem do epílogo): 75% da rolagem cobre 90% do vídeo e os 25% finais ficam com
+    // os últimos ~0,8 s, quando o porta-filtro sobe e a xícara aparece inteira
+    timeMap: [
+      [0, 0],
+      [0.75, 0.9],
+      [1, 1],
+    ],
+    step: { number: "06", title: "Extração", text: "9 bar. 25 segundos. Uma xícara." },
   },
 ];
