@@ -1,10 +1,10 @@
-// Fontes servidas pelo próprio site (mais rápido que o Google Fonts e melhor no Lighthouse)
-import "./styles/fonts.css";
+// As fontes (servidas pelo próprio site, com preload) estão declaradas no <head> do index.html.
 import "lenis/dist/lenis.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/film.css";
 import "./styles/sections.css";
+import "./styles/fx.css";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -12,7 +12,10 @@ import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
 import { SCENES } from "./config/scenes.js";
 import { initFilm } from "./film/film.js";
-import { hideIntro, playIntro } from "./sections/intro.js";
+import { initCursor } from "./fx/cursor.js";
+import { initMagnetic } from "./fx/magnetic.js";
+import { initTilt } from "./fx/tilt.js";
+import { playIntro } from "./sections/intro.js";
 import { initManifesto } from "./sections/manifesto.js";
 import { initOrigens } from "./sections/origens.js";
 import { initPreloader } from "./sections/preloader.js";
@@ -41,26 +44,38 @@ if (!reducedMotion) {
   gsap.ticker.lagSmoothing(0);
 }
 
-// seções na ordem da página (o ScrollTrigger calcula as posições nessa ordem)
+// O filme e o preloader primeiro (é o que aparece na tela); as outras seções entram em tarefas separadas, na
+// ordem da página (o ScrollTrigger calcula as posições nessa ordem). Tudo numa tarefa só travava a página por
+// ~650 ms no celular (Lighthouse); em pedaços, o navegador respira entre um e outro.
 const film = initFilm({ gsap, ScrollTrigger, reducedMotion });
-initProdutos(document.getElementById("produtos"));
-initManifesto({ gsap, SplitText, reducedMotion });
-initOrigens({ gsap, ScrollTrigger, reducedMotion });
-initReveals({ gsap, SplitText, ScrollTrigger, reducedMotion });
-
-// preloader e entrada da abertura
 if (reducedMotion) {
   document.getElementById("preloader")?.remove();
 } else {
-  const showIntro = hideIntro({ gsap });
-  initPreloader({ gsap, film, lenis }).then(() => {
-    showIntro();
-    playIntro({ gsap, SplitText });
-  });
+  initPreloader({ gsap, film, lenis, onReveal: () => playIntro({ gsap, SplitText }) });
 }
 
-// as fontes mudam a altura dos textos: recalcula as posições quando chegarem
-document.fonts.ready.then(() => ScrollTrigger.refresh());
+const nextTask = () => new Promise((resolve) => setTimeout(resolve, 0));
+const sections = [
+  () => initProdutos(document.getElementById("produtos")),
+  () => initManifesto({ gsap, SplitText, reducedMotion }),
+  () => initOrigens({ gsap, ScrollTrigger, reducedMotion }),
+  () => initReveals({ gsap, SplitText, ScrollTrigger, reducedMotion }),
+  // efeitos de mouse (só computador; cada um confere sozinho se há mouse e se o movimento está liberado)
+  () => {
+    initCursor({ gsap });
+    initTilt({ gsap });
+    initMagnetic({ gsap });
+  },
+];
+(async () => {
+  for (const init of sections) {
+    await nextTask();
+    init();
+  }
+  // as fontes mudam a altura dos textos: um único recálculo de posições quando elas e as seções estiverem prontas
+  await document.fonts.ready;
+  ScrollTrigger.refresh();
+})();
 
 if (import.meta.env.DEV) {
   window.__st = ScrollTrigger; // só para os testes automáticos do modo de desenvolvimento

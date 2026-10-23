@@ -1,0 +1,118 @@
+﻿/* ============ Granulado de filme (por cima de tudo, 6%) ============ */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.06;
+  /* ruído pronto em PNG (128 px, 16 KB): bem mais leve para o navegador que gerar o ruído com filtro SVG */
+  background-image: url("../assets/grain.png");
+  background-size: 128px 128px;
+  animation: grain 0.9s steps(6) infinite;
+  will-change: transform;
+}
+
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  17% {
+    transform: translate(-6%, 4%);
+  }
+  33% {
+    transform: translate(5%, -7%);
+  }
+  50% {
+    transform: translate(-3%, 8%);
+  }
+  67% {
+    transform: translate(8%, 2%);
+  }
+  83% {
+    transform: translate(-7%, -4%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* toque: granulado parado (poupa bateria e a composição da tela) */
+@media (hover: none), (pointer: coarse) {
+  .grain {
+    animation: none;
+  }
+}
+
+/* ============ Cursor próprio (só mouse) ============ */
+.has-cursor,
+.has-cursor a,
+.has-cursor button {
+  cursor: none;
+}
+
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+}
+
+.cursor--ring {
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  border: 1px solid rgba(242, 234, 223, 0.5);
+  transition:
+    width 0.4s var(--ease-out),
+    height 0.4s var(--ease-out),
+    margin 0.4s var(--ease-out),
+    background-color 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+}
+
+.cursor--ring.is-hover {
+  width: 68px;
+  height: 68px;
+  margin: -34px 0 0 -34px;
+  border-color: var(--c-amber);
+  background: rgba(208, 138, 62, 0.12);
+}
+
+.cursor--ring.is-down {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+}
+
+.cursor--dot {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  background: var(--c-amber);
+}
+
+/* ============ Reflexo da inclinação dos cartões ============ */
+.produto {
+  position: relative;
+}
+
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%), rgba(242, 234, 223, 0.1), rgba(242, 234, 223, 0) 45%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out);
+}
+
+.produto.is-tilting .tilt-glare {
+  opacity: 1;
+}
+
+.reduced-motion .grain {
+  animation: none;
+}

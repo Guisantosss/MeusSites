@@ -537,6 +537,7 @@ html.is-loading {
   padding: var(--section-pad) 0;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
 }
 
 .reduced-motion .origem,

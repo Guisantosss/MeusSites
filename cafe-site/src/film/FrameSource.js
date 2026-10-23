@@ -50,6 +50,7 @@ export class FrameSource {
     this.loader = new FrameLoader({
       base: `${BASE}frames/${mode}/`,
       scenes,
+      packs: this.manifest.packs[mode],
       radius: mode === "mobile" ? 14 : 20,
       coarse: mode === "mobile" ? 12 : 8,
       onFrame: this.onFrame,

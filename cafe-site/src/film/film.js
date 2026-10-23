@@ -45,7 +45,8 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
     .then((r) => (r.ok && !forceKeyframes ? r.json() : null))
     .catch(() => null)
     .then((manifest) => {
-      const useFrames = manifest && Object.keys(manifest.scenes ?? {}).length > 0;
+      // manifest versão 2: quadros empacotados (heads.pack + um pacote por cena)
+      const useFrames = manifest?.packs && Object.keys(manifest.scenes ?? {}).length > 0;
       source = useFrames ? new FrameSource(manifest, redraw) : new KeyframeSource(redraw);
       if (useFrames) {
         source.onProgress = (p) => (loadProgress = p);
@@ -112,6 +113,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
   const dustOverlay = (ctx, box) => dust.draw(ctx, box, state.local);
 
   const perf = { n: 0, total: 0, max: 0 }; // tempo do desenho, para a conferência do modo de desenvolvimento
+  let uiState = null; // os textos só são reescritos quando a rolagem muda (quadro novo chegando só redesenha o canvas)
   gsap.ticker.add(() => {
     if (!dirty) return;
     dirty = false;
@@ -120,9 +122,12 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
       canvas.draw(source.layers(state), dustOverlay, dustActive());
       section.classList.add("is-ready");
     }
-    steps.update(state);
-    progress.update(state);
-    hero.update(state);
+    if (state !== uiState) {
+      uiState = state;
+      steps.update(state);
+      progress.update(state);
+      hero.update(state);
+    }
     const dt = performance.now() - t0;
     perf.n++;
     perf.total += dt;

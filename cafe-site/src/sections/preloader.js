@@ -3,9 +3,10 @@
 // Sai com uma cortina para cima e libera a rolagem.
 
 const MIN_MS = 900; // mesmo com cache, fica o suficiente para ser lido
-const MAX_MS = 15000; // rede muito lenta: sai assim mesmo (o filme mostra o quadro pronto mais próximo)
+const MAX_MS = 10000; // rede muito lenta: sai assim mesmo (o filme mostra o quadro pronto mais próximo)
 
-export function initPreloader({ gsap, film, lenis }) {
+/** `onReveal` roda quando a cortina começa a subir (a entrada da abertura acontece por baixo dela). */
+export function initPreloader({ gsap, film, lenis, onReveal }) {
   const el = document.getElementById("preloader");
   if (!el || !film.loading) {
     el?.remove();
@@ -52,7 +53,8 @@ export function initPreloader({ gsap, film, lenis }) {
           ease: "power2.in",
           stagger: 0.05,
         })
-        .to(el, { clipPath: "inset(0 0 100% 0)", duration: 0.9, ease: "power3.inOut" }, "-=0.15");
+        .call(() => onReveal?.(), null, "-=0.15")
+        .to(el, { clipPath: "inset(0 0 100% 0)", duration: 0.9, ease: "power3.inOut" }, "<");
     };
     gsap.ticker.add(tick);
   });
