@@ -7,3 +7,4 @@ o GitHub Actions (`.github/workflows/deploy.yml`) monta todos e publica em
 | Site | Endereço |
 | --- | --- |
 | MOÍDO, site vitrine da Icreativa (hamburgueria fictícia) | https://guisantosss.github.io/MeusSites/moido-site/ |
+| Crema, site vitrine da Icreativa (café de especialidade fictício, filme na rolagem) | https://guisantosss.github.io/MeusSites/cafe-site/ |
