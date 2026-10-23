@@ -3,13 +3,18 @@ import "./styles/fonts.css";
 import "lenis/dist/lenis.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
+import "./styles/film.css";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
+import { SCENES } from "./config/scenes.js";
+import { initFilm } from "./film/film.js";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
+// a barra de endereço do celular aparecendo/sumindo não recalcula as posições (evita pulos no meio do filme)
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.documentElement.classList.toggle("reduced-motion", reducedMotion);
@@ -24,20 +29,25 @@ if (!reducedMotion) {
   gsap.ticker.lagSmoothing(0);
 }
 
-// Conferência da Fase 1: no modo de desenvolvimento, um contador no canto mostra o progresso da página
-// lido pelo ScrollTrigger. Se ele acompanha a rolagem sem saltos, Lenis e GSAP estão sincronizados.
+const film = initFilm({ gsap, ScrollTrigger, reducedMotion });
+
+// as fontes mudam a altura dos textos: recalcula as posições quando chegarem
+document.fonts.ready.then(() => ScrollTrigger.refresh());
+
+// Conferência no modo de desenvolvimento: cena atual, progresso dentro dela e do filme.
 if (import.meta.env.DEV) {
+  window.__st = ScrollTrigger; // só para os testes automáticos do modo de desenvolvimento
   const out = document.createElement("div");
   out.className = "dev-scroll";
   document.body.append(out);
-  ScrollTrigger.create({
-    start: 0,
-    end: "max",
-    onUpdate: (self) => {
-      out.textContent = `rolagem ${(self.progress * 100).toFixed(1)}% · ${lenis ? "Lenis ligado" : "movimento reduzido"}`;
-    },
+  let lastTxt = "";
+  gsap.ticker.add(() => {
+    const s = film.getState();
+    const txt = s
+      ? `${s.kind === "scene" ? SCENES[s.sceneIndex].id : s.kind} ${(s.local * 100).toFixed(0)}% · filme ${(s.P * 100).toFixed(1)}% · provisório`
+      : "movimento reduzido";
+    if (txt !== lastTxt) out.textContent = lastTxt = txt;
   });
-  out.textContent = `rolagem 0.0% · ${lenis ? "Lenis ligado" : "movimento reduzido"}`;
 }
 
 export { gsap, ScrollTrigger, SplitText, lenis, reducedMotion };

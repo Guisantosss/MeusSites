@@ -1,0 +1,357 @@
+/* ============ Filme ============ */
+.film {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+}
+
+.film__stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--c-bg);
+}
+
+.film__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.film.is-ready .film__canvas {
+  opacity: 1;
+}
+
+/* escurece a direita (onde ficam os textos) e a base (barra de etapas); no notebook a imagem fica deslocada
+   para a esquerda e a borda direita dela some aqui dentro */
+.film__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, 0.5) 74%, rgba(0, 0, 0, 0.9) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 24%);
+}
+
+/* ============ Abertura ============ */
+.hero {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  text-align: right;
+  padding: 0 var(--gutter) clamp(84px, 12vh, 140px);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.hero__title {
+  font-size: clamp(5rem, 1rem + 12.5vw, 15rem);
+  line-height: 0.8;
+  letter-spacing: -0.025em;
+}
+
+.hero__subtitle {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: var(--t-lg);
+  line-height: 1.1;
+  margin-top: 0.45em;
+}
+
+.hero__hint {
+  position: absolute;
+  left: var(--gutter);
+  bottom: clamp(22px, 3.6vh, 34px);
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+
+/* ============ Etapas ============ */
+.steps {
+  position: absolute;
+  right: var(--gutter);
+  bottom: clamp(104px, 15vh, 168px);
+  width: min(24rem, 30vw);
+  pointer-events: none;
+}
+
+.steps__number {
+  display: flex;
+  height: 1em;
+  margin: 0 0 0.18em;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: var(--t-2xl);
+  line-height: 1;
+  color: var(--c-amber);
+  opacity: 0;
+}
+
+.steps__digit {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+}
+
+.steps__roll {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.steps__roll > span {
+  display: block;
+  height: 1em;
+}
+
+.steps__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  grid-area: 1 / 1;
+  opacity: 0;
+}
+
+.step__title {
+  font-size: var(--t-xl);
+  line-height: 1;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+}
+
+.step__line {
+  display: block;
+  transform: translate3d(0, 105%, 0);
+  will-change: transform;
+}
+
+.step__text {
+  margin-top: 0.7rem;
+  max-width: 24ch;
+  font-size: var(--t-md);
+  line-height: 1.4;
+  color: var(--c-text);
+  opacity: 0;
+}
+
+.step__counter {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-line);
+  opacity: 0;
+}
+
+.step__value {
+  font-family: var(--f-display);
+  font-size: var(--t-lg);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.step__label {
+  font-size: var(--t-sm);
+  color: var(--c-muted);
+}
+
+/* ============ Barra de etapas ============ */
+.film__progress {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: clamp(20px, 3.4vh, 32px);
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.seg {
+  flex: var(--w) 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.seg__label {
+  font-size: var(--t-xs);
+  letter-spacing: 0.02em;
+  color: var(--c-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.5s var(--ease-out);
+}
+
+.seg.is-active .seg__label {
+  color: var(--c-text);
+}
+
+.seg__track {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: rgba(242, 234, 223, 0.16);
+}
+
+.seg__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--c-amber);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* ============ Celular e telas em pé: quadro quadrado em cima, textos embaixo ============ */
+.film[data-mode="square"] .film__scrim {
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 18%);
+}
+
+.film[data-mode="square"] .hero {
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  padding: calc(var(--sq-bottom) + clamp(4px, 1.5vh, 16px)) var(--gutter) 0;
+}
+
+.film[data-mode="square"] .hero__title {
+  font-size: clamp(4.25rem, 24vw, 8rem);
+}
+
+.film[data-mode="square"] .hero__hint {
+  left: 0;
+  right: 0;
+  text-align: center;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+.film[data-mode="square"] .steps {
+  left: var(--gutter);
+  right: var(--gutter);
+  width: auto;
+  top: calc(var(--sq-bottom) + clamp(0px, 1vh, 12px));
+  bottom: auto;
+}
+
+.film[data-mode="square"] .steps__number {
+  font-size: var(--t-xl);
+  margin-bottom: 0.08em;
+}
+
+.film[data-mode="square"] .step__title {
+  font-size: var(--t-lg);
+}
+
+.film[data-mode="square"] .step__text {
+  margin-top: 0.45rem;
+  font-size: var(--t-base);
+  max-width: 32ch;
+}
+
+.film[data-mode="square"] .step__counter {
+  margin-top: 0.9rem;
+  padding-top: 0.7rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.film[data-mode="square"] .film__progress {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+.film[data-mode="square"] .seg__label {
+  display: none;
+}
+
+/* ============ Movimento reduzido: imagens paradas, uma por etapa ============ */
+.film--static {
+  height: auto;
+}
+
+.film--static .film__stage {
+  height: auto;
+  overflow: visible;
+}
+
+.film--static .film__canvas,
+.film--static .film__scrim,
+.film--static .film__progress,
+.film--static .steps {
+  display: none;
+}
+
+.film--static .hero {
+  position: relative;
+  inset: auto;
+  min-height: 70vh;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--section-pad) var(--gutter);
+}
+
+.film--static .hero__hint {
+  display: none;
+}
+
+.film-static {
+  display: grid;
+  gap: clamp(64px, 12vh, 140px);
+  margin: 0;
+  padding: 0 var(--gutter) var(--section-pad);
+  list-style: none;
+}
+
+.film-static__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+}
+
+.film-static__item img {
+  width: 100%;
+  height: auto;
+}
+
+.film-static__number {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: var(--t-xl);
+  line-height: 1;
+  color: var(--c-amber);
+}
+
+.film-static__title {
+  font-size: var(--t-xl);
+  margin: 0.2em 0 0.4em;
+}
+
+.film-static__counter {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--c-line);
+  font-family: var(--f-display);
+  font-size: var(--t-lg);
+}
+
+@media (max-width: 767px) {
+  .film-static__item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

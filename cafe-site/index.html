@@ -21,6 +21,7 @@
       <section class="film" id="film" aria-label="Do pé à xícara">
         <div class="film__stage">
           <canvas class="film__canvas" aria-hidden="true"></canvas>
+          <div class="film__scrim" aria-hidden="true"></div>
 
           <div class="hero" id="hero">
             <h1 class="hero__title">Crema</h1>
@@ -28,7 +29,8 @@
             <p class="hero__hint">Role para baixo</p>
           </div>
 
-          <ol class="steps" id="steps" aria-label="Etapas do café"></ol>
+          <!-- etapas e barra montadas a partir de src/config/scenes.js -->
+          <div class="steps" id="steps" aria-label="Etapas do café"></div>
           <div class="film__progress" aria-hidden="true"></div>
         </div>
       </section>
