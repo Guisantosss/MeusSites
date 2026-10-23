@@ -17,7 +17,10 @@ export function createProgress(root) {
       segs.forEach((s, i) => s.el.style.setProperty("--w", weights[i]));
     },
     update(state) {
-      root.style.opacity = state.kind === "intro" ? smoothstep(0.55, 1, state.local).toFixed(3) : 1;
+      let o = 1;
+      if (state.kind === "intro") o = smoothstep(0.55, 1, state.local);
+      else if (state.kind === "outro") o = 1 - smoothstep(0.04, 0.14, state.local); // sai junto com a etapa 05
+      root.style.opacity = o.toFixed(3);
       segs.forEach((s, i) => {
         let v = 0;
         if (state.kind === "outro" || i < state.sceneIndex) v = 1;

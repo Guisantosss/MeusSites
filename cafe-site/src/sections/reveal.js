@@ -1,37 +1,40 @@
-// Entradas discretas das seções (o filme é a estrela): títulos sobem por linha de dentro de uma máscara,
-// textos de apoio e cartões aparecem uma vez ao entrar na tela.
-export function initReveals({ gsap, SplitText, ScrollTrigger, reducedMotion }) {
+// Entradas discretas das seções (o filme é a estrela): títulos sobem por linha de dentro de uma máscara, textos de
+// apoio aparecem, os itens do cardápio chegam em sequência com a linha se desenhando.
+// Aqui só se marca .is-in quando o elemento entra na tela; o movimento é uma transição de CSS (opacidade e posição),
+// que o navegador roda na placa de vídeo. Medido no celular com CPU 4x: as mesmas entradas feitas quadro a quadro
+// pelo GSAP obrigavam a página inteira a recalcular estilo e camadas a cada quadro, e a rolagem caía a 30 por segundo.
+export function initReveals({ SplitText, ScrollTrigger, reducedMotion }) {
   if (reducedMotion) return;
 
-  document.querySelectorAll(".section-title, .cta__title").forEach((el) => {
-    SplitText.create(el, {
-      type: "lines",
-      mask: "lines",
-      autoSplit: true,
-      onSplit: (self) =>
-        gsap.from(self.lines, {
-          yPercent: 105,
-          duration: 1.1,
-          ease: "expo.out",
-          stagger: 0.08,
-          scrollTrigger: { trigger: el, start: "top 85%", once: true },
+  /** Marca a entrada, com um atraso crescente para quem entrou junto (--d). */
+  const enter = (els, step) =>
+    els.forEach((el, i) => {
+      el.style.setProperty("--d", `${(i * step).toFixed(2)}s`);
+      el.classList.add("is-in");
+    });
+
+  // dividir os títulos em linhas mede o texto (caro): um título por vez, nos momentos ociosos do navegador, e não
+  // tudo junto na abertura do site. Título que chegar à tela antes de ser dividido só aparece, sem a subida.
+  const idle = (fn, o) => (window.requestIdleCallback ? window.requestIdleCallback(fn, o) : setTimeout(fn, 200));
+  document.querySelectorAll(".section-title").forEach((el) =>
+    idle(
+      () =>
+        SplitText.create(el, {
+          type: "lines",
+          mask: "lines",
+          linesClass: "title-line",
+          autoSplit: true,
+          onSplit: (self) => self.lines.forEach((line, i) => line.style.setProperty("--i", i)),
         }),
-    });
-  });
+      { timeout: 3000 },
+    ),
+  );
 
-  gsap.utils.toArray(".section-lead, .cta .btn, .cta__info").forEach((el) => {
-    gsap.from(el, {
-      opacity: 0,
-      y: 16,
-      duration: 1,
-      ease: "power2.out",
-      scrollTrigger: { trigger: el, start: "top 90%", once: true },
-    });
-  });
-
-  ScrollTrigger.batch(".produto", {
+  ScrollTrigger.batch(".section-title, .eyebrow, .section-lead, .visite__status, .visite .btn, .visite__info", {
     start: "top 88%",
     once: true,
-    onEnter: (cards) => gsap.from(cards, { opacity: 0, y: 40, duration: 1.1, ease: "expo.out", stagger: 0.09 }),
+    onEnter: (els) => enter(els, 0.06),
   });
+  ScrollTrigger.batch(".menu__item", { start: "top 92%", once: true, onEnter: (rows) => enter(rows, 0.08) });
+  ScrollTrigger.batch(".graos__body", { start: "top 78%", once: true, onEnter: (els) => enter(els, 0) });
 }

@@ -1,8 +1,6 @@
-// Inclinação 3D dos cartões de produto ao passar o mouse (só computador), com um reflexo de luz que
-// acompanha o cursor. Volta suave ao sair.
-const MAX = 8; // graus
-
-export function initTilt({ gsap, selector = ".produto" }) {
+// Inclinação 3D ao passar o mouse (só computador), com um reflexo de luz que acompanha o cursor. Volta suave ao
+// sair. Hoje vale para o palco da embalagem na seção de grãos.
+export function initTilt({ gsap, selector = ".graos__stage", max = 8 }) {
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!fine || reduced) return;
@@ -20,8 +18,8 @@ export function initTilt({ gsap, selector = ".produto" }) {
       const r = card.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width; // 0..1
       const py = (e.clientY - r.top) / r.height;
-      ry((px - 0.5) * 2 * MAX);
-      rx(-(py - 0.5) * 2 * MAX);
+      ry((px - 0.5) * 2 * max);
+      rx(-(py - 0.5) * 2 * max);
       glare.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
       glare.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
     });

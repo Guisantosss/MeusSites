@@ -49,14 +49,9 @@ canvas {
 }
 
 /* ---------- seções (detalhes em sections.css) ---------- */
-.produtos,
-.cta {
+.cardapio,
+.graos {
   padding: var(--section-pad) var(--gutter);
-}
-
-.cta {
-  min-height: 100vh;
-  min-height: 100svh;
 }
 
 /* ---------- rodapé ---------- */

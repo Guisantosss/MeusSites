@@ -2,6 +2,7 @@
 // O ScrollTrigger só informa o progresso; o desenho acontece no relógio do GSAP, uma vez por quadro e só se mudou.
 import { FILM, SCENES } from "../config/scenes.js";
 import { DustField } from "../fx/dust.js";
+import { createEpilogue } from "../sections/epilogue.js";
 import { createHero } from "../sections/hero.js";
 import { createProgress } from "../sections/progress.js";
 import { createSteps } from "../sections/steps.js";
@@ -21,6 +22,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
   const steps = createSteps(section.querySelector(".steps"));
   const progress = createProgress(section.querySelector(".film__progress"));
   const hero = createHero(section.querySelector(".hero"));
+  const epilogue = createEpilogue(section.querySelector(".epilogue"));
   let segs = buildTimeline();
   // FILM.scrollVh vale para o filme completo; com uma cena mais curta (sem vídeo), a rolagem total encolhe junto,
   // assim cada cena mantém o ritmo
@@ -103,6 +105,10 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
       state = stateAt(segs, self.progress);
       dirty = true;
     },
+    // filme terminado (o epílogo acaba no preto): o palco sai da pintura, e o navegador deixa de montar as camadas
+    // dele a cada quadro enquanto a pessoa lê as outras seções
+    onLeave: () => (stage.style.visibility = "hidden"),
+    onEnterBack: () => (stage.style.visibility = ""),
   });
 
   // pó só na cena que ainda não tem vídeo (quando a T5 chegar, ele desliga sozinho)
@@ -119,7 +125,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
     dirty = false;
     const t0 = performance.now();
     if (source?.firstReady) {
-      canvas.draw(source.layers(state), dustOverlay, dustActive());
+      canvas.draw(source.layers(state), dustOverlay, dustActive(), epilogue.camera(state, mode));
       section.classList.add("is-ready");
     }
     if (state !== uiState) {
@@ -127,6 +133,7 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
       steps.update(state);
       progress.update(state);
       hero.update(state);
+      epilogue.update(state);
     }
     const dt = performance.now() - t0;
     perf.n++;
@@ -143,7 +150,8 @@ export function initFilm({ gsap, ScrollTrigger, reducedMotion }) {
   };
 }
 
-/** Movimento reduzido: sem filme por rolagem. Cada etapa vira uma imagem parada com os mesmos textos. */
+/** Movimento reduzido: sem filme por rolagem. Cada etapa vira uma imagem parada com os mesmos textos e o manifesto
+ *  (o epílogo) fica depois delas, como texto normal. */
 function initStatic(section) {
   section.classList.add("film--static");
   const fmt = new Intl.NumberFormat("pt-BR");
@@ -161,6 +169,6 @@ function initStatic(section) {
       </div>
     </li>`,
   ).join("");
-  section.querySelector(".film__stage").append(list);
+  section.querySelector(".film__stage").insertBefore(list, section.querySelector(".epilogue"));
   return { getState: () => null };
 }

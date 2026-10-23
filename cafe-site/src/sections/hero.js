@@ -14,6 +14,7 @@ export function createHero(root) {
       root.style.opacity = (1 - smoothstep(0.04, 0.82, h)).toFixed(3);
       root.style.transform = `translate3d(0, ${(-h * 5).toFixed(3)}vh, 0)`;
       root.style.visibility = h >= 0.82 ? "hidden" : "visible";
+      root.classList.toggle("is-gone", h >= 0.82); // para a animação do indicador de rolagem
       if (hint) hint.style.opacity = (1 - smoothstep(0, 0.3, h)).toFixed(3);
     },
   };

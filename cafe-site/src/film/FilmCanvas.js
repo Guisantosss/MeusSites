@@ -55,10 +55,13 @@ export class FilmCanvas {
   }
 
   /** `overlay(ctx, area)`: desenho extra por cima (o pó), na área inteira do canvas; devolve se desenhou algo.
+   *  `camera` (epílogo): { z, fx, fy, k } = aproxima z vezes em volta do ponto (fx, fy) da imagem (fração dela) e
+   *  leva esse ponto, na fração k, até o centro do quadro.
    *  Se as camadas são as mesmas do último desenho e não há nada por cima, não redesenha: com os quadros reais
    *  cada quadro do vídeo dura vários pixels de rolagem, e repintar a mesma imagem era trabalho jogado fora. */
-  draw(layers, overlay, overlayActive = false) {
-    const sig = layers.map((l) => (l.img ? `${this.idOf(l.img)}:${l.alpha.toFixed(3)}:${l.scale.toFixed(4)}` : "-")).join("|");
+  draw(layers, overlay, overlayActive = false, camera = null) {
+    const cam = camera ? `@${camera.z.toFixed(4)}:${camera.k.toFixed(4)}` : "";
+    const sig = layers.map((l) => (l.img ? `${this.idOf(l.img)}:${l.alpha.toFixed(3)}:${l.scale.toFixed(4)}` : "-")).join("|") + cam;
     if (!overlayActive && !this.lastOverlay && sig === this.lastSig) return;
     this.lastSig = sig;
     this.lastOverlay = overlayActive;
@@ -71,13 +74,27 @@ export class FilmCanvas {
     for (const layer of layers) {
       if (!layer.img || layer.alpha <= 0) continue;
       const r = this.rectFor(layer.img);
+      if (camera) this.applyCamera(layer.img, r, camera);
       const w = r.w * layer.scale;
       const h = r.h * layer.scale;
       ctx.globalAlpha = Math.min(1, layer.alpha);
       ctx.drawImage(layer.img, r.sx, r.sy, r.sw, r.sh, r.x + (r.w - w) / 2, r.y + (r.h - h) / 2, w, h);
     }
     ctx.globalAlpha = 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (overlayActive) overlay?.(ctx, { x: 0, y: 0, w: bw, h: bh });
+  }
+
+  /** Transformação da câmera: o ponto (fx, fy) da imagem vai para o alvo e tudo cresce z vezes em volta dele. */
+  applyCamera(img, r, { z, fx, fy, k }) {
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+    const px = r.x + ((fx * iw - r.sx) / r.sw) * r.w;
+    const py = r.y + ((fy * ih - r.sy) / r.sh) * r.h;
+    const tx = px + (this.box.w / 2 - px) * k;
+    const ty = py + (this.box.h / 2 - py) * k;
+    const { dpr } = this;
+    this.ctx.setTransform(dpr * z, 0, 0, dpr * z, dpr * (tx - z * px), dpr * (ty - z * py));
   }
 
   /** Identificador estável de cada imagem (para saber se a camada mudou). */

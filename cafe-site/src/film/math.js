@@ -8,6 +8,10 @@ export const smoothstep = (a, b, v) => {
 
 export const easeOutCubic = (t) => 1 - Math.pow(1 - clamp(t), 3);
 export const easeInOutSine = (t) => -(Math.cos(Math.PI * clamp(t)) - 1) / 2;
+export const easeInOutCubic = (t) => {
+  const x = clamp(t);
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+};
 
 /** Gerador pseudoaleatório com semente: as partículas nascem sempre iguais, então rolar para cima desfaz igualzinho. */
 export function seeded(seed) {

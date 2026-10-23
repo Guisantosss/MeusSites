@@ -94,11 +94,7 @@
   background: var(--c-amber);
 }
 
-/* ============ Reflexo da inclinação dos cartões ============ */
-.produto {
-  position: relative;
-}
-
+/* ============ Reflexo da inclinação (palco da embalagem) ============ */
 .tilt-glare {
   position: absolute;
   inset: 0;
@@ -109,7 +105,7 @@
   transition: opacity 0.4s var(--ease-out);
 }
 
-.produto.is-tilting .tilt-glare {
+.is-tilting > .tilt-glare {
   opacity: 1;
 }
 

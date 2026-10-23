@@ -62,6 +62,18 @@
       <span class="sr-only">Carregando o filme</span>
     </div>
 
+    <!-- menu fixo: aparece depois do filme (topbar.js) -->
+    <header class="topbar" id="topbar">
+      <a class="topbar__brand" href="#film">Crema</a>
+      <nav class="topbar__nav" aria-label="Seções">
+        <a href="#origens">Origens</a>
+        <a href="#cardapio">Cardápio</a>
+        <a href="#graos">Grãos</a>
+        <a href="#visite">Visite</a>
+      </nav>
+      <a class="btn btn--small topbar__cta" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20conhecer%20os%20caf%C3%A9s%20da%20Crema." target="_blank" rel="noopener">Pedir</a>
+    </header>
+
     <main id="conteudo">
       <!-- 2 e 3. Filme: canvas preso na tela; a abertura (hero) e as etapas ficam por cima dele -->
       <section class="film" id="film" aria-label="Do pé à xícara">
@@ -78,29 +90,43 @@
           <!-- etapas e barra montadas a partir de src/config/scenes.js -->
           <div class="steps" id="steps" aria-label="Etapas do café"></div>
           <div class="film__progress" aria-hidden="true"></div>
+
+          <!-- epílogo: a câmera mergulha na crema e o manifesto acende por cima; depois, preto -->
+          <div class="epilogue">
+            <div class="epilogue__veil" aria-hidden="true"></div>
+            <div class="epilogue__content">
+              <div class="epilogue__head">
+                <h2 class="epilogue__lead">Café bom não tem segredo. Tem cuidado.</h2>
+              </div>
+              <p class="epilogue__text">
+                A gente colhe no ponto, torra em pequenos lotes e mói na hora de virar xícara. O resto é tempo, e o
+                tempo a gente respeita.
+              </p>
+            </div>
+            <div class="epilogue__black" aria-hidden="true"></div>
+          </div>
         </div>
       </section>
 
-      <!-- 4. Manifesto: as palavras "acendem" com a rolagem -->
-      <section class="manifesto" id="manifesto" aria-label="Manifesto">
-        <p class="manifesto__text">
-          Café bom não tem segredo. Tem cuidado. A gente colhe no ponto, torra em pequenos lotes e mói na hora de
-          virar xícara. O resto é tempo, e o tempo a gente respeita.
-        </p>
-      </section>
-
-      <!-- 5. Origens: rolagem horizontal. TODO: origens provisórias (regiões reais, dados típicos de cada região) -->
+      <!-- 4. Origens: rolagem horizontal subindo a serra (altímetro e linha do relevo montados em origens.js).
+           TODO: origens provisórias (regiões reais, dados típicos de cada região) -->
       <section class="origens" id="origens" aria-labelledby="origens-titulo">
         <div class="origens__pin">
+          <div class="altimetro" aria-hidden="true">
+            <span class="altimetro__label">Altitude</span>
+            <span class="altimetro__value"><span class="altimetro__num">0</span> m</span>
+          </div>
           <div class="origens__track">
+            <div class="relevo" aria-hidden="true"></div>
             <header class="origens__intro">
+              <p class="eyebrow"><span class="eyebrow__num">01</span>Origens</p>
               <h2 class="section-title" id="origens-titulo">De onde vem</h2>
               <p class="section-lead">
-                Três origens, três jeitos de ser café. Compramos em pequenos lotes, direto de quem planta.
+                Três origens, três jeitos de ser café. Quanto mais alto, mais devagar o grão amadurece, e mais doce ele fica.
               </p>
             </header>
 
-            <article class="origem">
+            <article class="origem" data-alt="1350">
               <figure class="origem__foto">
                 <img src="./img/origens/brasil.webp" width="900" height="1125" loading="lazy" decoding="async"
                   alt="Galho de cafeeiro com cerejas vermelhas e amarelas entre folhas verdes" />
@@ -117,7 +143,7 @@
               </div>
             </article>
 
-            <article class="origem">
+            <article class="origem" data-alt="1900">
               <figure class="origem__foto">
                 <img src="./img/origens/colombia.webp" width="900" height="1125" loading="lazy" decoding="async"
                   alt="Cafeeiro com cerejas verdes e uma vermelha madura, numa lavoura da Colômbia" />
@@ -134,7 +160,7 @@
               </div>
             </article>
 
-            <article class="origem">
+            <article class="origem" data-alt="2200">
               <figure class="origem__foto">
                 <img src="./img/origens/etiopia.webp" width="900" height="1125" loading="lazy" decoding="async"
                   alt="Café servido da jebena, o bule tradicional etíope, numa xícara branca" />
@@ -154,93 +180,210 @@
         </div>
       </section>
 
-      <!-- 6. Produtos. TODO: nomes, notas, preços e fotos provisórios (embalagem desenhada em SVG) -->
-      <section class="produtos" id="produtos" aria-labelledby="produtos-titulo">
-        <header class="produtos__head">
-          <h2 class="section-title" id="produtos-titulo">Para levar para casa</h2>
-          <p class="section-lead">Grãos torrados toda semana, em pacotes de 250 g. Se preferir, a gente mói na hora.</p>
+      <!-- faixa entre seções: anda com a rolagem -->
+      <div class="faixa" aria-hidden="true">
+        <div class="faixa__track">
+          <span>Torrado toda semana</span><i class="faixa__grao"></i><span class="faixa__alt">Moído na hora</span><i class="faixa__grao"></i>
+          <span>Direto de quem planta</span><i class="faixa__grao"></i><span class="faixa__alt">Servido com calma</span><i class="faixa__grao"></i>
+          <span>Torrado toda semana</span><i class="faixa__grao"></i><span class="faixa__alt">Moído na hora</span><i class="faixa__grao"></i>
+          <span>Direto de quem planta</span><i class="faixa__grao"></i><span class="faixa__alt">Servido com calma</span><i class="faixa__grao"></i>
+        </div>
+      </div>
+
+      <!-- 5. Cardápio: no computador a foto segue o cursor; no celular cada item tem a sua miniatura.
+           TODO: itens e preços provisórios -->
+      <section class="cardapio" id="cardapio" aria-labelledby="cardapio-titulo">
+        <header class="cardapio__head">
+          <p class="eyebrow"><span class="eyebrow__num">02</span>Na xícara</p>
+          <h2 class="section-title" id="cardapio-titulo">Feito na hora, na sua frente.</h2>
+          <p class="section-lead">Cardápio curto de propósito: cada bebida sai com o café da semana, moído na hora.</p>
         </header>
-        <div class="produtos__grid">
-          <article class="produto" data-bag="minas">
-            <div class="produto__visual" aria-hidden="true"></div>
-            <div class="produto__info">
-              <h3 class="produto__nome">Sul de Minas</h3>
-              <p class="produto__notas">Caramelo e chocolate ao leite</p>
-              <dl class="ficha ficha--produto">
-                <div><dt>Torra</dt><dd><span class="torra" style="--n: 3" role="img" aria-label="Torra média"></span>Média</dd></div>
-                <div><dt>Peso</dt><dd>250 g</dd></div>
-              </dl>
-              <div class="produto__compra">
-                <p class="produto__preco">R$ 54,90</p>
-                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Sul%20de%20Minas%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="produto" data-bag="huila">
-            <div class="produto__visual" aria-hidden="true"></div>
-            <div class="produto__info">
-              <h3 class="produto__nome">Huila</h3>
-              <p class="produto__notas">Rapadura e laranja</p>
-              <dl class="ficha ficha--produto">
-                <div><dt>Torra</dt><dd><span class="torra" style="--n: 2" role="img" aria-label="Torra média clara"></span>Média clara</dd></div>
-                <div><dt>Peso</dt><dd>250 g</dd></div>
-              </dl>
-              <div class="produto__compra">
-                <p class="produto__preco">R$ 64,90</p>
-                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Huila%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="produto" data-bag="sidamo">
-            <div class="produto__visual" aria-hidden="true"></div>
-            <div class="produto__info">
-              <h3 class="produto__nome">Sidamo</h3>
-              <p class="produto__notas">Jasmim e bergamota</p>
-              <dl class="ficha ficha--produto">
-                <div><dt>Torra</dt><dd><span class="torra" style="--n: 1" role="img" aria-label="Torra clara"></span>Clara</dd></div>
-                <div><dt>Peso</dt><dd>250 g</dd></div>
-              </dl>
-              <div class="produto__compra">
-                <p class="produto__preco">R$ 79,90</p>
-                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Sidamo%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="produto" data-bag="casa">
-            <div class="produto__visual" aria-hidden="true"></div>
-            <div class="produto__info">
-              <h3 class="produto__nome">Da Casa</h3>
-              <p class="produto__notas">Cacau e nozes, para o dia a dia</p>
-              <dl class="ficha ficha--produto">
-                <div><dt>Torra</dt><dd><span class="torra" style="--n: 4" role="img" aria-label="Torra média escura"></span>Média escura</dd></div>
-                <div><dt>Peso</dt><dd>250 g</dd></div>
-              </dl>
-              <div class="produto__compra">
-                <p class="produto__preco">R$ 44,90</p>
-                <a class="btn btn--ghost" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Da%20Casa%20da%20Crema." target="_blank" rel="noopener">Comprar</a>
-              </div>
-            </div>
-          </article>
+        <ul class="menu">
+          <li class="menu__item" data-shot="espresso">
+            <img class="menu__thumb" src="./img/menu/espresso-mini.webp" width="300" height="375" loading="lazy" decoding="async" alt="" />
+            <span class="menu__num" aria-hidden="true">01</span>
+            <h3 class="menu__nome">Espresso</h3>
+            <p class="menu__desc">Curto e denso, com crema dourada.</p>
+            <p class="menu__preco">R$ 8</p>
+          </li>
+          <li class="menu__item" data-shot="cappuccino">
+            <img class="menu__thumb" src="./img/menu/cappuccino-mini.webp" width="300" height="375" loading="lazy" decoding="async" alt="" />
+            <span class="menu__num" aria-hidden="true">02</span>
+            <h3 class="menu__nome">Cappuccino</h3>
+            <p class="menu__desc">Espresso, leite vaporizado e espuma fina.</p>
+            <p class="menu__preco">R$ 14</p>
+          </li>
+          <li class="menu__item" data-shot="flatwhite">
+            <img class="menu__thumb" src="./img/menu/flatwhite-mini.webp" width="300" height="375" loading="lazy" decoding="async" alt="" />
+            <span class="menu__num" aria-hidden="true">03</span>
+            <h3 class="menu__nome">Flat white</h3>
+            <p class="menu__desc">Dose dupla e leite sedoso, quase sem espuma.</p>
+            <p class="menu__preco">R$ 15</p>
+          </li>
+          <li class="menu__item" data-shot="coado">
+            <img class="menu__thumb" src="./img/menu/coado-mini.webp" width="300" height="375" loading="lazy" decoding="async" alt="" />
+            <span class="menu__num" aria-hidden="true">04</span>
+            <h3 class="menu__nome">Coado do dia</h3>
+            <p class="menu__desc">No filtro, com a origem da semana.</p>
+            <p class="menu__preco">R$ 12</p>
+          </li>
+          <li class="menu__item" data-shot="gelado">
+            <img class="menu__thumb" src="./img/menu/gelado-mini.webp" width="300" height="375" loading="lazy" decoding="async" alt="" />
+            <span class="menu__num" aria-hidden="true">05</span>
+            <h3 class="menu__nome">Latte gelado</h3>
+            <p class="menu__desc">Espresso, leite e muito gelo.</p>
+            <p class="menu__preco">R$ 16</p>
+          </li>
+          <li class="menu__item" data-shot="paodequeijo">
+            <img class="menu__thumb" src="./img/menu/paodequeijo-mini.webp" width="300" height="375" loading="lazy" decoding="async" alt="" />
+            <span class="menu__num" aria-hidden="true">06</span>
+            <h3 class="menu__nome">Pão de queijo</h3>
+            <p class="menu__desc">Da fornada da manhã, receita mineira.</p>
+            <p class="menu__preco">R$ 7</p>
+          </li>
+        </ul>
+        <!-- foto que segue o cursor (só computador); as imagens entram quando a seção se aproxima -->
+        <div class="menu__preview" aria-hidden="true">
+          <div class="menu__frame">
+            <img class="menu__shot" data-shot="espresso" data-src="./img/menu/espresso.webp" width="640" height="800" alt="" />
+            <img class="menu__shot" data-shot="cappuccino" data-src="./img/menu/cappuccino.webp" width="640" height="800" alt="" />
+            <img class="menu__shot" data-shot="flatwhite" data-src="./img/menu/flatwhite.webp" width="640" height="800" alt="" />
+            <img class="menu__shot" data-shot="coado" data-src="./img/menu/coado.webp" width="640" height="800" alt="" />
+            <img class="menu__shot" data-shot="gelado" data-src="./img/menu/gelado.webp" width="640" height="800" alt="" />
+            <img class="menu__shot" data-shot="paodequeijo" data-src="./img/menu/paodequeijo.webp" width="640" height="800" alt="" />
+          </div>
         </div>
       </section>
 
-      <!-- 7. Chamada final sobre a K5. TODO: WhatsApp (número), endereço e horário reais -->
-      <section class="cta" id="cta" aria-labelledby="cta-titulo">
-        <div class="cta__bg" aria-hidden="true">
-          <img src="./img/keyframes/desktop/K5_xicara.webp" width="1920" height="1080" loading="lazy" decoding="async" alt="" />
+      <!-- 6. Grãos para levar: escolha por abas (a embalagem é desenhada em SVG por graos.js).
+           TODO: nomes, notas, perfil sensorial e preços provisórios -->
+      <section class="graos" id="graos" aria-labelledby="graos-titulo">
+        <header class="graos__head">
+          <p class="eyebrow"><span class="eyebrow__num">03</span>Para levar</p>
+          <h2 class="section-title" id="graos-titulo">Escolha o seu café</h2>
+          <p class="section-lead">Grãos torrados toda semana, em pacotes de 250 g. Se preferir, a gente mói na hora.</p>
+        </header>
+
+        <div class="graos__body">
+          <div class="graos__stage" aria-hidden="true">
+            <div class="graos__glow"></div>
+            <p class="graos__ghost"></p>
+            <div class="graos__bags"></div>
+          </div>
+
+          <div class="graos__side">
+            <div class="graos__tabs" role="tablist" aria-label="Cafés para levar">
+              <button class="graos__tab" type="button" role="tab" id="tab-minas" aria-controls="painel-minas" aria-selected="true" data-bag="minas">
+                <span class="graos__tabnum">01</span><span class="graos__tabname">Sul de Minas</span><span class="graos__taborigem">Brasil</span>
+              </button>
+              <button class="graos__tab" type="button" role="tab" id="tab-huila" aria-controls="painel-huila" aria-selected="false" tabindex="-1" data-bag="huila">
+                <span class="graos__tabnum">02</span><span class="graos__tabname">Huila</span><span class="graos__taborigem">Colômbia</span>
+              </button>
+              <button class="graos__tab" type="button" role="tab" id="tab-sidamo" aria-controls="painel-sidamo" aria-selected="false" tabindex="-1" data-bag="sidamo">
+                <span class="graos__tabnum">03</span><span class="graos__tabname">Sidamo</span><span class="graos__taborigem">Etiópia</span>
+              </button>
+              <button class="graos__tab" type="button" role="tab" id="tab-casa" aria-controls="painel-casa" aria-selected="false" tabindex="-1" data-bag="casa">
+                <span class="graos__tabnum">04</span><span class="graos__tabname">Da Casa</span><span class="graos__taborigem">Blend</span>
+              </button>
+            </div>
+
+            <div class="graos__panel" role="tabpanel" id="painel-minas" aria-labelledby="tab-minas" tabindex="0">
+              <p class="graos__notas">Caramelo, castanhas e chocolate ao leite.</p>
+              <dl class="sensorial">
+                <div><dt>Doçura</dt><dd><span class="barra" style="--v: 4" role="img" aria-label="4 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Acidez</dt><dd><span class="barra" style="--v: 2" role="img" aria-label="2 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Corpo</dt><dd><span class="barra" style="--v: 4" role="img" aria-label="4 de 5"><span class="barra__fill"></span></span></dd></div>
+              </dl>
+              <dl class="ficha">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 3" role="img" aria-label="Torra média"></span>Média</dd></div>
+                <div><dt>Processo</dt><dd>Natural</dd></div>
+                <div><dt>Pacote</dt><dd>250 g, em grãos ou moído</dd></div>
+              </dl>
+              <div class="graos__compra">
+                <p class="graos__preco">R$ 54,90</p>
+                <a class="btn btn--primary" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Sul%20de%20Minas%20da%20Crema." target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
+              </div>
+            </div>
+
+            <div class="graos__panel" role="tabpanel" id="painel-huila" aria-labelledby="tab-huila" tabindex="0" hidden>
+              <p class="graos__notas">Rapadura, laranja e cacau.</p>
+              <dl class="sensorial">
+                <div><dt>Doçura</dt><dd><span class="barra" style="--v: 4" role="img" aria-label="4 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Acidez</dt><dd><span class="barra" style="--v: 4" role="img" aria-label="4 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Corpo</dt><dd><span class="barra" style="--v: 3" role="img" aria-label="3 de 5"><span class="barra__fill"></span></span></dd></div>
+              </dl>
+              <dl class="ficha">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 2" role="img" aria-label="Torra média clara"></span>Média clara</dd></div>
+                <div><dt>Processo</dt><dd>Lavado</dd></div>
+                <div><dt>Pacote</dt><dd>250 g, em grãos ou moído</dd></div>
+              </dl>
+              <div class="graos__compra">
+                <p class="graos__preco">R$ 64,90</p>
+                <a class="btn btn--primary" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Huila%20da%20Crema." target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
+              </div>
+            </div>
+
+            <div class="graos__panel" role="tabpanel" id="painel-sidamo" aria-labelledby="tab-sidamo" tabindex="0" hidden>
+              <p class="graos__notas">Jasmim, bergamota e frutas vermelhas.</p>
+              <dl class="sensorial">
+                <div><dt>Doçura</dt><dd><span class="barra" style="--v: 3" role="img" aria-label="3 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Acidez</dt><dd><span class="barra" style="--v: 5" role="img" aria-label="5 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Corpo</dt><dd><span class="barra" style="--v: 2" role="img" aria-label="2 de 5"><span class="barra__fill"></span></span></dd></div>
+              </dl>
+              <dl class="ficha">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 1" role="img" aria-label="Torra clara"></span>Clara</dd></div>
+                <div><dt>Processo</dt><dd>Lavado</dd></div>
+                <div><dt>Pacote</dt><dd>250 g, em grãos ou moído</dd></div>
+              </dl>
+              <div class="graos__compra">
+                <p class="graos__preco">R$ 79,90</p>
+                <a class="btn btn--primary" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Sidamo%20da%20Crema." target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
+              </div>
+            </div>
+
+            <div class="graos__panel" role="tabpanel" id="painel-casa" aria-labelledby="tab-casa" tabindex="0" hidden>
+              <p class="graos__notas">Cacau e nozes, para o dia a dia.</p>
+              <dl class="sensorial">
+                <div><dt>Doçura</dt><dd><span class="barra" style="--v: 3" role="img" aria-label="3 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Acidez</dt><dd><span class="barra" style="--v: 2" role="img" aria-label="2 de 5"><span class="barra__fill"></span></span></dd></div>
+                <div><dt>Corpo</dt><dd><span class="barra" style="--v: 5" role="img" aria-label="5 de 5"><span class="barra__fill"></span></span></dd></div>
+              </dl>
+              <dl class="ficha">
+                <div><dt>Torra</dt><dd><span class="torra" style="--n: 4" role="img" aria-label="Torra média escura"></span>Média escura</dd></div>
+                <div><dt>Processo</dt><dd>Blend de naturais</dd></div>
+                <div><dt>Pacote</dt><dd>250 g, em grãos ou moído</dd></div>
+              </dl>
+              <div class="graos__compra">
+                <p class="graos__preco">R$ 44,90</p>
+                <a class="btn btn--primary" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20o%20caf%C3%A9%20Da%20Casa%20da%20Crema." target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="cta__content">
-          <h2 class="cta__title" id="cta-titulo">Sua próxima xícara começa aqui.</h2>
-          <p class="section-lead">Peça pelo WhatsApp ou venha provar na torrefação. A gente separa o seu pacote.</p>
+      </section>
+
+      <!-- 7. Visite: o salão, com o "aberto agora" calculado no horário de São Paulo (visite.js).
+           TODO: WhatsApp (número), endereço e horário reais -->
+      <section class="visite" id="visite" aria-labelledby="visite-titulo">
+        <div class="visite__bg" aria-hidden="true">
+          <!-- no celular, um recorte em pé (bem mais leve de decodificar que a foto larga) -->
+          <picture>
+            <source media="(max-width: 767px)" srcset="./img/visite/salao-cel.webp" width="900" height="1180" />
+            <img srcset="./img/visite/salao-1080.webp 1080w, ./img/visite/salao-1920.webp 1920w" sizes="100vw"
+              src="./img/visite/salao-1920.webp" width="1920" height="1452" loading="lazy" decoding="async" alt="" />
+          </picture>
+        </div>
+        <div class="visite__content">
+          <p class="eyebrow"><span class="eyebrow__num">04</span>Visite</p>
+          <h2 class="section-title" id="visite-titulo">Passa aqui. Tem café passando.</h2>
+          <p class="visite__status"><span class="visite__dot" aria-hidden="true"></span><span class="visite__status-text">Seg a sáb, das 8h às 18h</span></p>
+          <p class="section-lead">Venha provar na torrefação ou peça pelo WhatsApp. A gente separa o seu pacote.</p>
           <a class="btn btn--primary btn--magnetic" href="https://wa.me/?text=Ol%C3%A1!%20Quero%20conhecer%20os%20caf%C3%A9s%20da%20Crema." target="_blank" rel="noopener">
             <span>Pedir pelo WhatsApp</span>
           </a>
-          <dl class="cta__info">
-            <div><dt>Endereço</dt><dd>Rua Exemplo, 123, São Paulo</dd></div>
-            <div><dt>Horário</dt><dd>Seg a sáb, das 8h às 18h</dd></div>
+          <dl class="visite__info">
+            <div><dt>Endereço</dt><dd>Rua Exemplo, 123<br />São Paulo, SP</dd></div>
+            <div><dt>Horário</dt><dd>Seg a sáb, das 8h às 18h<br />Domingo, fechado</dd></div>
           </dl>
         </div>
       </section>
@@ -252,10 +395,16 @@
         <p>Crema é uma marca fictícia, criada pela Icreativa para demonstração.</p>
         <p>Quer um site assim? Fale com a Icreativa:<br /><a href="https://icreativa.com.br" target="_blank" rel="noopener">icreativa.com.br</a> e <a href="https://instagram.com/icreativanetwork" target="_blank" rel="noopener">@icreativanetwork</a></p>
         <p class="footer__credits">
-          Fotos das origens:
+          Fotos no Unsplash:
           <a href="https://unsplash.com/@allecgomes" target="_blank" rel="noopener">Allec Gomes</a>,
           <a href="https://unsplash.com/@juanfernino" target="_blank" rel="noopener">Juan Nino</a> e
-          <a href="https://unsplash.com/@amanuelet" target="_blank" rel="noopener">Amanuel Kebede</a>, no Unsplash.
+          <a href="https://unsplash.com/@amanuelet" target="_blank" rel="noopener">Amanuel Kebede</a> (origens);
+          <a href="https://unsplash.com/photos/lGAgPyuA6rI" target="_blank" rel="noopener">Alexandr Popadin</a>,
+          <a href="https://unsplash.com/photos/_sii6-ed508" target="_blank" rel="noopener">Kae Ng</a>,
+          <a href="https://unsplash.com/photos/KGR2u2rG6c4" target="_blank" rel="noopener">Beau Carpenter</a>,
+          <a href="https://unsplash.com/photos/rzX8bOle9xs" target="_blank" rel="noopener">pariwat pannium</a> e
+          <a href="https://unsplash.com/@rodolfoallen" target="_blank" rel="noopener">rodolfo allen_</a> (cardápio);
+          <a href="https://unsplash.com/@jamessestric" target="_blank" rel="noopener">James Sestric</a> (salão).
         </p>
       </div>
     </footer>

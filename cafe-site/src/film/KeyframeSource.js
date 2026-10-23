@@ -58,7 +58,8 @@ export class KeyframeSource {
     const first = SCENES[0];
     const last = SCENES[SCENES.length - 1];
     if (state.kind === "intro") return [{ img: this.get(first.from), alpha: 1, scale: 1 }];
-    if (state.kind === "outro") return [{ img: this.get(last.to), alpha: 1, scale: 1 + 0.02 * easeInOutSine(state.local) }];
+    // no epílogo quem aproxima é a câmera do canvas (em volta da crema), não a escala da camada
+    if (state.kind === "outro") return [{ img: this.get(last.to), alpha: 1, scale: 1 }];
 
     const scene = SCENES[state.sceneIndex];
     const l = state.local;

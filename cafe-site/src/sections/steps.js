@@ -57,6 +57,8 @@ export function createSteps(root) {
 
   return {
     update(state) {
+      // no epílogo a etapa 05 sai de cena para o manifesto entrar
+      root.style.opacity = state.kind === "outro" ? (1 - smoothstep(0.04, 0.14, state.local)).toFixed(3) : "";
       // número: "0" fixo e o segundo dígito rola para o próximo no fim de cada cena
       let pos = state.sceneIndex;
       if (state.kind === "scene" && state.sceneIndex < LAST) pos += smoothstep(0.86, 0.99, state.local);

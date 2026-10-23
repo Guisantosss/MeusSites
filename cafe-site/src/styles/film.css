@@ -234,6 +234,64 @@
   transform-origin: left center;
 }
 
+/* ============ Epílogo: manifesto sobre a crema (opacidades e posições vêm do epilogue.js) ============ */
+.epilogue {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.epilogue__veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse 62% 58% at 50% 50%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.66) 58%, rgba(0, 0, 0, 0.94) 100%);
+}
+
+.epilogue__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3.4vh, 36px);
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+
+.epilogue__lead {
+  max-width: 13ch;
+  font-size: clamp(3rem, 1rem + 5.8vw, 7.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  opacity: 0;
+  will-change: transform, opacity;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
+}
+
+.epilogue__word {
+  opacity: 0.2;
+}
+
+.epilogue__text {
+  max-width: 40ch;
+  font-size: var(--t-md);
+  line-height: 1.45;
+  text-wrap: balance;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.epilogue__black {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+}
+
 /* ============ Celular e telas em pé: quadro quadrado em cima, textos embaixo ============ */
 .film[data-mode="square"] .film__scrim {
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 18%);
@@ -297,6 +355,36 @@
   display: none;
 }
 
+/* epílogo no celular: o título sobre a crema (no quadrado) e o parágrafo embaixo, onde ficavam as etapas */
+.film[data-mode="square"] .epilogue__veil {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.film[data-mode="square"] .epilogue__head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--sq-top);
+  height: calc(var(--sq-bottom) - var(--sq-top));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--gutter);
+}
+
+.film[data-mode="square"] .epilogue__lead {
+  font-size: clamp(2.4rem, 11vw, 4rem);
+}
+
+.film[data-mode="square"] .epilogue__text {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: calc(var(--sq-bottom) + clamp(8px, 2vh, 24px));
+  max-width: none;
+  font-size: var(--t-base);
+}
+
 /* ============ Movimento reduzido: imagens paradas, uma por etapa ============ */
 .film--static {
   height: auto;
@@ -326,6 +414,30 @@
 
 .film--static .hero__hint {
   display: none;
+}
+
+/* manifesto como texto normal, depois das etapas */
+.film--static .epilogue {
+  position: relative;
+  inset: auto;
+  visibility: visible;
+  padding: 0 0 var(--section-pad);
+}
+
+.film--static .epilogue__veil,
+.film--static .epilogue__black {
+  display: none;
+}
+
+.film--static .epilogue__content {
+  position: relative;
+  inset: auto;
+}
+
+.film--static .epilogue__lead,
+.film--static .epilogue__word,
+.film--static .epilogue__text {
+  opacity: 1;
 }
 
 .film-static {

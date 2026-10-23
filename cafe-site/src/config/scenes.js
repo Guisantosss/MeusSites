@@ -2,11 +2,17 @@
 // Os pesos são o ponto de partida do plano; o ajuste fino é feito no navegador (Fase 3).
 
 export const FILM = {
-  scrollVh: 800, // comprimento total da rolagem do filme, em vh
-  // trechos parados nas pontas (mesma unidade dos pesos das cenas):
+  scrollVh: 980, // comprimento total da rolagem do filme, em vh (era 800 antes do epílogo: o mesmo ritmo por cena)
+  // trechos nas pontas (mesma unidade dos pesos das cenas):
   intro: 0.3, // a cereja fica parada enquanto o nome da marca sai de cena
-  outro: 0.25, // a xícara fica parada com a etapa 05 na tela antes do filme soltar
+  outro: 1.5, // epílogo: a câmera mergulha na crema, o manifesto acende por cima e tudo escurece até o preto
   squareBelow: 768, // abaixo desta largura (ou com a tela em pé) o filme usa o recorte quadrado do celular
+  // Epílogo sobre a última imagem do filme (hoje a K5; quando o vídeo T5 chegar, conferir se a crema continua aqui).
+  // focus: centro da crema, em fração da imagem de cada modo. zoom: quanto a câmera avança até o fim.
+  epilogue: {
+    desktop: { focus: { x: 0.495, y: 0.47 }, zoom: 2.5 },
+    mobile: { focus: { x: 0.49, y: 0.48 }, zoom: 1.9 },
+  },
 };
 
 export const SCENES = [

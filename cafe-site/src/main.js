@@ -15,12 +15,16 @@ import { initFilm } from "./film/film.js";
 import { initCursor } from "./fx/cursor.js";
 import { initMagnetic } from "./fx/magnetic.js";
 import { initTilt } from "./fx/tilt.js";
+import { markVisible } from "./fx/visibility.js";
+import { initCardapio } from "./sections/cardapio.js";
+import { initFaixa } from "./sections/faixa.js";
+import { initGraos } from "./sections/graos.js";
 import { playIntro } from "./sections/intro.js";
-import { initManifesto } from "./sections/manifesto.js";
 import { initOrigens } from "./sections/origens.js";
 import { initPreloader } from "./sections/preloader.js";
-import { initProdutos } from "./sections/produtos.js";
 import { initReveals } from "./sections/reveal.js";
+import { initTopbar } from "./sections/topbar.js";
+import { initVisite } from "./sections/visite.js";
 
 document.documentElement.classList.remove("no-js");
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -35,9 +39,12 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 document.documentElement.classList.toggle("reduced-motion", reducedMotion);
 
 // Rolagem suave: Lenis no mouse e no trackpad; no toque fica a rolagem nativa do celular (mais fiel no iPhone).
+// No toque o Lenis nem é criado: ele não suavizaria nada e ainda dobrava o trabalho do ScrollTrigger a cada
+// evento de rolagem (medido no celular com CPU 4x).
 // O relógio do GSAP move o Lenis e cada passo do Lenis atualiza o ScrollTrigger, então os dois andam juntos.
+const touch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 let lenis = null;
-if (!reducedMotion) {
+if (!reducedMotion && !touch) {
   lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
   lenis.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
@@ -56,22 +63,30 @@ if (reducedMotion) {
 
 const nextTask = () => new Promise((resolve) => setTimeout(resolve, 0));
 const sections = [
-  () => initProdutos(document.getElementById("produtos")),
-  () => initManifesto({ gsap, SplitText, reducedMotion }),
   () => initOrigens({ gsap, ScrollTrigger, reducedMotion }),
-  () => initReveals({ gsap, SplitText, ScrollTrigger, reducedMotion }),
+  () => initFaixa({ gsap, reducedMotion }),
+  () => initCardapio({ gsap, ScrollTrigger, reducedMotion }),
+  () => initGraos({ gsap, reducedMotion }),
+  () => initVisite({ gsap, reducedMotion }),
+  () => initReveals({ SplitText, ScrollTrigger, reducedMotion }),
+  () => initTopbar({ ScrollTrigger, lenis }),
+  () => markVisible(".graos, .visite"),
   // efeitos de mouse (só computador; cada um confere sozinho se há mouse e se o movimento está liberado)
   () => {
     initCursor({ gsap });
-    initTilt({ gsap });
+    initTilt({ gsap, selector: ".graos__stage", max: 5 });
     initMagnetic({ gsap });
   },
 ];
 (async () => {
+  const tempos = import.meta.env.DEV ? [] : null; // conferência: quanto custa montar cada seção
   for (const init of sections) {
     await nextTask();
+    const t0 = performance.now();
     init();
+    tempos?.push(Math.round(performance.now() - t0));
   }
+  if (tempos) window.__tempos = tempos;
   // as fontes mudam a altura dos textos: um único recálculo de posições quando elas e as seções estiverem prontas
   await document.fonts.ready;
   ScrollTrigger.refresh();
